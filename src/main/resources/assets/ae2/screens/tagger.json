@@ -1,0 +1,31 @@
+{
+  "$schema": "schema.json",
+  "includes": ["common/common.json"],
+  "generatedBackground": {
+    "height": 100,
+    "width": 176
+  },
+  "text": {
+    "dialog_title": {
+      "text": {
+        "translate": "gui.ae2patterntagger.taggertitle"
+      },
+      "position": {
+        "left": 8,
+        "top": 6
+      }
+    }
+  },
+  "widgets": {
+    "input":{
+      "left": 28,
+      "top": 37,
+      "width": 110,
+      "height": 30
+    },
+    "confirm":{
+      "left": 152,
+      "top": 35
+    }
+  }
+}

@@ -1,0 +1,27 @@
+package org.ae2PatternTagger.ae2patterntagger.items;
+
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.neoforged.neoforge.registries.DeferredItem;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+import org.ae2PatternTagger.ae2patterntagger.blocks.BlockRegisters;
+import org.ae2PatternTagger.ae2patterntagger.items.components.ComponentRegisters;
+import org.ae2PatternTagger.ae2patterntagger.items.components.PatternProviderTag;
+
+import static org.ae2PatternTagger.ae2patterntagger.Ae2patterntagger.MODID;
+
+public class ItemRegisters {
+    public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
+
+    public static final String MY_ITEM_ID = "my_item";
+    public static final DeferredItem<Item> MY_ITEM = ITEMS.registerSimpleItem(MY_ITEM_ID, new Item.Properties());
+
+    public static final String TAGGER_ID = "tagger";
+    public static final DeferredItem<Item> TAGGER = ITEMS.registerItem(
+            TAGGER_ID,
+            TaggerItem::new,
+//            new Item.Properties().component(ComponentRegisters.PATTERN_PROVIDER_TAG, new PatternProviderTag("sample"))
+            new Item.Properties());
+}
