@@ -6,23 +6,26 @@ import appeng.client.gui.Icon;
 import appeng.client.gui.style.BackgroundGenerator;
 import appeng.client.gui.style.ScreenStyle;
 import appeng.client.gui.widgets.*;
-import com.mojang.logging.LogUtils;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import org.ae2PatternTagger.ae2patterntagger.Ae2patterntagger;
 import org.ae2PatternTagger.ae2patterntagger.items.components.PatternProviderTag;
 import org.ae2PatternTagger.ae2patterntagger.items.components.TaggerSetting;
+import org.ae2PatternTagger.ae2patterntagger.menus.widgets.IScrollViewData;
 import org.ae2PatternTagger.ae2patterntagger.menus.widgets.MActionButton;
-import org.slf4j.Logger;
+import org.ae2PatternTagger.ae2patterntagger.menus.widgets.ScrollView;
+import org.ae2PatternTagger.ae2patterntagger.menus.widgets.TaggerSVItem;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TaggerScreen extends AEBaseScreen<TaggerMenu> {
 
     private final AETextField inputField;
     private final ToggleButton lockButton;
     private final IconButton confirmButton;
+    private final ScrollView<PatternProviderTag> scrollView;
+    private final Scrollbar scrollbar;
 
     public TaggerScreen(TaggerMenu menu, Inventory playerInventory, Component title, ScreenStyle style) {
         super(menu, playerInventory, title, style);
@@ -46,6 +49,17 @@ public class TaggerScreen extends AEBaseScreen<TaggerMenu> {
         }, GUIText.TaggerEditConfirm.text());
 
         widgets.add("confirm", confirmButton);
+
+        scrollbar = widgets.addScrollBar("scrollbar");
+        scrollView = new ScrollView<>(new IScrollViewData.ScrollViewData<>(), new TaggerSVItem<>(24, 60), scrollbar, style);
+        var sv_data = new ArrayList<PatternProviderTag>();
+        sv_data.add(new PatternProviderTag("111"));
+        sv_data.add(new PatternProviderTag("222"));
+        sv_data.add(new PatternProviderTag("333"));
+        sv_data.add(new PatternProviderTag("444"));
+        sv_data.add(new PatternProviderTag("555"));
+        scrollView.setData(sv_data);
+        widgets.add("scrollview", scrollView);
     }
 
     @Override

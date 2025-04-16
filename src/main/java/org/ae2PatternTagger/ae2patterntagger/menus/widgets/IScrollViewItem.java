@@ -14,4 +14,10 @@ public interface IScrollViewItem<T> extends ICompositeWidget {
     default int getWidth() {
         return 36;
     }
+
+//    void onMouseDown(int btn);
+//
+//    void onMouseUp(int btn);
+//
+//    void onMouseHover();
 }

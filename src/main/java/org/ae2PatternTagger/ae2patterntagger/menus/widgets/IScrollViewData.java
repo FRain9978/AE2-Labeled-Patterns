@@ -18,6 +18,9 @@ public interface IScrollViewData<T> {
             this.count = data.size();
         }
 
+        public ScrollViewData() {
+        }
+
         @Override
         public List<T> getData() {
             return data;
