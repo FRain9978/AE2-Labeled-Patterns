@@ -5,7 +5,7 @@ import appeng.client.gui.ICompositeWidget;
 public interface IScrollViewItem<T> extends ICompositeWidget {
     T getData();
 
-    void setData(T data);
+    IScrollViewItem<T> setData(T data);
 
     default int getHeight() {
         return 16;
@@ -20,4 +20,6 @@ public interface IScrollViewItem<T> extends ICompositeWidget {
 //    void onMouseUp(int btn);
 //
 //    void onMouseHover();
+
+
 }

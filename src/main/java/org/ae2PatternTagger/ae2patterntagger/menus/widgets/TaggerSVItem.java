@@ -1,6 +1,7 @@
 package org.ae2PatternTagger.ae2patterntagger.menus.widgets;
 
 import appeng.client.Point;
+import appeng.client.gui.widgets.AE2Button;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -15,9 +16,11 @@ public final class TaggerSVItem<T extends PatternProviderTag> implements IScroll
     private final int width;
 
     public TaggerSVItem(int height, int width) {
-        button = Button.builder(Component.empty(), (button) -> onPress()).size(getWidth(), getHeight()).build();
         this.height = height;
         this.width = width;
+//        button = AE2Button.builder(Component.empty(), (button) -> onPress()).size(getWidth(), getHeight()).build();
+        button = new AE2Button(Component.empty(), (button) -> onPress());
+        button.setSize(getWidth(), getHeight());
     }
 
     private T data;
@@ -37,8 +40,9 @@ public final class TaggerSVItem<T extends PatternProviderTag> implements IScroll
     }
 
     @Override
-    public void setData(T data) {
+    public IScrollViewItem<T> setData(T data) {
         this.data = data;
+        return this;
     }
 
     @Override
@@ -69,7 +73,7 @@ public final class TaggerSVItem<T extends PatternProviderTag> implements IScroll
 
     @Override
     public void drawForegroundLayer(GuiGraphics guiGraphics, Rect2i bounds, Point mouse) {
-        button.render(guiGraphics, mouse.getX(), mouse.getY(), 0);
+        button.render(guiGraphics, mouse.getX(), mouse.getY(), 1);
         guiGraphics.drawString(Minecraft.getInstance().font, Component.literal(data.name()),
                 this.bounds.getX() + 5,
                 this.bounds.getY() + 5, 0xFFFFFF);

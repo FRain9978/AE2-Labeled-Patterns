@@ -4,7 +4,9 @@
   "gui.ae2patterntagger.taggereditconfirm": "Confirm",
   "gui.ae2patterntagger.taggereditlock": "Lock Edit",
   "gui.ae2patterntagger.taggereditlockhint": "Block the input field for editing",
+  "gui.ae2patterntagger.taggereditsave": "Save",
   "gui.ae2patterntagger.taggerinputplaceholder": "enter tag name here",
+  "gui.ae2patterntagger.taggerlisttitle": "Tag List",
   "gui.ae2patterntagger.taggertitle": "Tagger",
   "item.ae2patterntagger.my_item": "My Item",
   "item.ae2patterntagger.tagger": "Tagger"

@@ -1,6 +1,7 @@
 package org.ae2PatternTagger.ae2patterntagger.menus;
 
 import appeng.api.config.YesNo;
+import appeng.api.storage.ISubMenuHost;
 import appeng.client.gui.AEBaseScreen;
 import appeng.client.gui.Icon;
 import appeng.client.gui.style.BackgroundGenerator;
@@ -11,10 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import org.ae2PatternTagger.ae2patterntagger.items.components.PatternProviderTag;
 import org.ae2PatternTagger.ae2patterntagger.items.components.TaggerSetting;
-import org.ae2PatternTagger.ae2patterntagger.menus.widgets.IScrollViewData;
-import org.ae2PatternTagger.ae2patterntagger.menus.widgets.MActionButton;
-import org.ae2PatternTagger.ae2patterntagger.menus.widgets.ScrollView;
-import org.ae2PatternTagger.ae2patterntagger.menus.widgets.TaggerSVItem;
+import org.ae2PatternTagger.ae2patterntagger.menus.widgets.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +22,9 @@ public class TaggerScreen extends AEBaseScreen<TaggerMenu> {
     private final AETextField inputField;
     private final ToggleButton lockButton;
     private final IconButton confirmButton;
-    private final ScrollView<PatternProviderTag> scrollView;
-    private final Scrollbar scrollbar;
+    private final IconButton saveButton;
+//    private final ScrollView<PatternProviderTag> scrollView;
+//    private final Scrollbar scrollbar;
 
     public TaggerScreen(TaggerMenu menu, Inventory playerInventory, Component title, ScreenStyle style) {
         super(menu, playerInventory, title, style);
@@ -48,18 +47,35 @@ public class TaggerScreen extends AEBaseScreen<TaggerMenu> {
             }
         }, GUIText.TaggerEditConfirm.text());
 
-        widgets.add("confirm", confirmButton);
+        saveButton = new MActionButton(Icon.VIEW_MODE_ALL, (button) -> {
+            if (this.menu.setting.isLockEdit() == YesNo.YES) return;
+            var text = this.inputField.getValue();
+            if (!text.isBlank()) {
+                this.menu.saveTag(new PatternProviderTag(text));
+            }
+        }, GUIText.TaggerEditSave.text());
 
-        scrollbar = widgets.addScrollBar("scrollbar");
-        scrollView = new ScrollView<>(new IScrollViewData.ScrollViewData<>(), new TaggerSVItem<>(24, 60), scrollbar, style);
-        var sv_data = new ArrayList<PatternProviderTag>();
-        sv_data.add(new PatternProviderTag("111"));
-        sv_data.add(new PatternProviderTag("222"));
-        sv_data.add(new PatternProviderTag("333"));
-        sv_data.add(new PatternProviderTag("444"));
-        sv_data.add(new PatternProviderTag("555"));
-        scrollView.setData(sv_data);
-        widgets.add("scrollview", scrollView);
+        widgets.add("confirm", confirmButton);
+        var host = this.menu.getHost();
+        if (host instanceof ISubMenuHost){
+            addToLeftToolbar(TagListButton.create(this, (ISubMenuHost) host , Component.literal("Open Tag List")));
+            addToLeftToolbar(saveButton);
+        }
+
+
+//        scrollbar = widgets.addScrollBar("scrollbar");
+//        scrollView = new ScrollView<>(new IScrollViewData.ScrollViewData<>(),
+//                ScrollViewItemBuilder.create(TaggerSVItem::new, 24, 60),
+//                scrollbar, style);
+//        var sv_data = new ArrayList<PatternProviderTag>();
+//        sv_data.add(new PatternProviderTag("111"));
+//        sv_data.add(new PatternProviderTag("222"));
+//        sv_data.add(new PatternProviderTag("333"));
+//        sv_data.add(new PatternProviderTag("444"));
+//        sv_data.add(new PatternProviderTag("555"));
+//        sv_data.add(new PatternProviderTag("666"));
+//        scrollView.setData(sv_data);
+//        widgets.add("scrollview", scrollView);
     }
 
     @Override

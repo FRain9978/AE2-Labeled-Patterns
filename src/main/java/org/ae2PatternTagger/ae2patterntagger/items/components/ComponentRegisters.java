@@ -1,10 +1,15 @@
 package org.ae2PatternTagger.ae2patterntagger.items.components;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.ae2PatternTagger.ae2patterntagger.Ae2patterntagger;
+
+import java.util.List;
 
 public class ComponentRegisters {
     public static final DeferredRegister.DataComponents COMPONENTS =
@@ -16,6 +21,15 @@ public class ComponentRegisters {
                     builder -> builder
                             .persistent(PatternProviderTag.CODEC)
                             .networkSynchronized(PatternProviderTag.STREAM_CODEC)
+                            .cacheEncoding()
+            );
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<PatternProviderTag>>> SAVED_TAGS =
+            COMPONENTS.registerComponentType(
+                    "saved_tags",
+                    builder -> builder
+                            .persistent(Codec.list(PatternProviderTag.CODEC))
+                            .networkSynchronized(PatternProviderTag.STREAM_CODEC.apply(ByteBufCodecs.list()))
                             .cacheEncoding()
             );
 

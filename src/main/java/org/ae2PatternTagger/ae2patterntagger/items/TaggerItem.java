@@ -1,16 +1,14 @@
 package org.ae2PatternTagger.ae2patterntagger.items;
 
-import appeng.api.config.InscriberInputCapacity;
 import appeng.api.config.Setting;
-import appeng.api.config.Settings;
 import appeng.api.config.YesNo;
 import appeng.api.implementations.menuobjects.IMenuItem;
 import appeng.api.implementations.menuobjects.ItemMenuHost;
+import appeng.api.storage.ISubMenuHost;
 import appeng.api.util.IConfigManager;
 import appeng.api.util.IConfigurableObject;
-import appeng.blockentity.crafting.PatternProviderBlockEntity;
+import appeng.menu.ISubMenu;
 import appeng.menu.MenuOpener;
-import appeng.menu.implementations.QuartzKnifeMenu;
 import appeng.menu.locator.ItemMenuHostLocator;
 import appeng.menu.locator.MenuLocators;
 import net.minecraft.network.chat.Component;
@@ -24,10 +22,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 import org.ae2PatternTagger.ae2patterntagger.MSettings;
-import org.ae2PatternTagger.ae2patterntagger.blocks.attachments.AttachmentRegisters;
 import org.ae2PatternTagger.ae2patterntagger.items.components.ComponentRegisters;
 import org.ae2PatternTagger.ae2patterntagger.items.components.PatternProviderTag;
 import org.ae2PatternTagger.ae2patterntagger.menus.TaggerMenu;
@@ -119,11 +115,28 @@ public class TaggerItem extends Item implements IMenuItem, IConfigurableObject {
 
     @Override
     public @Nullable ItemMenuHost<?> getMenuHost(Player player, ItemMenuHostLocator locator, @Nullable BlockHitResult hitResult) {
-        return new ItemMenuHost<>(this, player, locator);
+        return new TaggerItemMenuHost(this, player, locator);
     }
 
     @Override
     public IConfigManager getConfigManager() {
         return configManager;
+    }
+
+    public class TaggerItemMenuHost extends ItemMenuHost<TaggerItem> implements ISubMenuHost{
+
+        public TaggerItemMenuHost(TaggerItem item, Player player, ItemMenuHostLocator locator) {
+            super(item, player, locator);
+        }
+
+        @Override
+        public void returnToMainMenu(Player player, ISubMenu subMenu) {
+            MenuOpener.open(TaggerMenu.TYPE, player, subMenu.getLocator(), true);
+        }
+
+        @Override
+        public ItemStack getMainMenuIcon() {
+            return TaggerItem.this.getDefaultInstance();
+        }
     }
 }
