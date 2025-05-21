@@ -123,5 +123,10 @@ public class TaggerMenu extends AEBaseMenu implements ITagsProvider {
         List<PatternProviderTag> tags = iHost.getOrDefault(ComponentRegisters.SAVED_TAGS, new LinkedList<>());
         return tags.contains(tag);
     }
+
+    @Override
+    public void setCurrentTag(PatternProviderTag tag) {
+        setTag(tag);
+    }
 }
 

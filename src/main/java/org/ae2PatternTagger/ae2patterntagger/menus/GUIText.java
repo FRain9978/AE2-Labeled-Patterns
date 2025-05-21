@@ -15,6 +15,8 @@ public enum GUIText implements LocalizationEnum {
     TaggerEditLock("Lock Edit", "输入锁定"),
     TaggerEditLockHint("Block the input field for editing", "锁定输入框不允许编辑"),
     TaggerListTitle("Tag List", "标签列表"),
+    TaggerListSelect("Select", "选择"),
+    TaggerListDelete("Delete", "删除"),
     ;
     private final String root = "gui." + Ae2patterntagger.MODID;
 

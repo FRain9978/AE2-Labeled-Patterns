@@ -18,4 +18,6 @@ public interface ITagsProvider {
     default boolean canEdit() {;
         return true;
     }
+
+    void setCurrentTag(PatternProviderTag tag);
 }
