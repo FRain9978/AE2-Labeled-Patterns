@@ -2,7 +2,7 @@
   "$schema": "schema.json",
   "includes": ["common/common.json"],
   "generatedBackground": {
-    "height": 150,
+    "height": 100,
     "width": 176
   },
   "text": {
@@ -26,26 +26,6 @@
     "confirm":{
       "left": 152,
       "top": 35
-    },
-    "scrollview":{
-      "left": 48,
-      "top": 100,
-      "width": 1,
-      "height": 3
-    },
-    "scrollbar": {
-      "left": 170,
-      "top": 100,
-      "width": 12,
-      "height": 50
-    }
-  },
-  "images": {
-    "scrollview_background": {
-      "texture": "guis/dropmenu_bg.png",
-      "textureWidth": 16,
-      "textureHeight": 16,
-      "srcRect": [0, 0, 16, 16]
     }
   }
 }

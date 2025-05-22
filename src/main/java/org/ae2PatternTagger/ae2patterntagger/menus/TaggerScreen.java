@@ -3,6 +3,7 @@ package org.ae2PatternTagger.ae2patterntagger.menus;
 import appeng.api.config.YesNo;
 import appeng.api.storage.ISubMenuHost;
 import appeng.client.gui.AEBaseScreen;
+import appeng.client.gui.AESubScreen;
 import appeng.client.gui.Icon;
 import appeng.client.gui.style.BackgroundGenerator;
 import appeng.client.gui.style.ScreenStyle;
@@ -43,12 +44,11 @@ public class TaggerScreen extends AEBaseScreen<TaggerMenu> {
             if (this.menu.setting.isLockEdit() == YesNo.YES) return;
             var text = this.inputField.getValue();
             if (!text.isBlank()) {
-                this.menu.setTag(new PatternProviderTag(text));
+                this.menu.setCurrentTag(new PatternProviderTag(text));
             }
         }, GUIText.TaggerEditConfirm.text());
 
         saveButton = new MActionButton(Icon.VIEW_MODE_ALL, (button) -> {
-            if (this.menu.setting.isLockEdit() == YesNo.YES) return;
             var text = this.inputField.getValue();
             if (!text.isBlank()) {
                 this.menu.saveTag(new PatternProviderTag(text));
@@ -61,21 +61,6 @@ public class TaggerScreen extends AEBaseScreen<TaggerMenu> {
             addToLeftToolbar(TagListButton.create(this, (ISubMenuHost) host , Component.literal("Open Tag List")));
             addToLeftToolbar(saveButton);
         }
-
-
-//        scrollbar = widgets.addScrollBar("scrollbar");
-//        scrollView = new ScrollView<>(new IScrollViewData.ScrollViewData<>(),
-//                ScrollViewItemBuilder.create(TaggerSVItem::new, 24, 60),
-//                scrollbar, style);
-//        var sv_data = new ArrayList<PatternProviderTag>();
-//        sv_data.add(new PatternProviderTag("111"));
-//        sv_data.add(new PatternProviderTag("222"));
-//        sv_data.add(new PatternProviderTag("333"));
-//        sv_data.add(new PatternProviderTag("444"));
-//        sv_data.add(new PatternProviderTag("555"));
-//        sv_data.add(new PatternProviderTag("666"));
-//        scrollView.setData(sv_data);
-//        widgets.add("scrollview", scrollView);
     }
 
     @Override
@@ -119,5 +104,13 @@ public class TaggerScreen extends AEBaseScreen<TaggerMenu> {
 
     }
 
-
+    @Override
+    protected <P extends AEBaseScreen<TaggerMenu>> void onReturnFromSubScreen(AESubScreen<TaggerMenu, P> subScreen) {
+        super.onReturnFromSubScreen(subScreen);
+        if (subScreen instanceof TagListScreen) {
+            if (menu.tag != null && !menu.tag.name().isBlank()) {
+                this.inputField.setValue(menu.tag.name());
+            }
+        }
+    }
 }

@@ -20,4 +20,6 @@ public interface ITagsProvider {
     }
 
     void setCurrentTag(PatternProviderTag tag);
+
+    void deleteTag(PatternProviderTag tag);
 }

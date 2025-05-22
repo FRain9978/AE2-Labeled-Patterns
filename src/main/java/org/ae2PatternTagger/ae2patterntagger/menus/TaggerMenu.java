@@ -27,6 +27,7 @@ public class TaggerMenu extends AEBaseMenu implements ITagsProvider {
     private static final String ACTION_SET_TAG = "setTag";
     private static final String ACTION_SET_SETTING = "setSetting";
     private static final String ACTION_SAVE_TAG = "saveTag";
+    private static final String ACTION_DELETE_TAG = "deleteTag";
     public PatternProviderTag tag;
     public List<PatternProviderTag> saved_tags;
     public TaggerSetting setting;
@@ -43,21 +44,22 @@ public class TaggerMenu extends AEBaseMenu implements ITagsProvider {
         saved_tags = iHost.getOrDefault(ComponentRegisters.SAVED_TAGS, new ArrayList<>());
         setting = iHost.getOrDefault(ComponentRegisters.TAGGER_SETTING, new TaggerSetting());
 
-        registerClientAction(ACTION_SET_TAG, PatternProviderTag.class, this::setTag);
+        registerClientAction(ACTION_SET_TAG, PatternProviderTag.class, this::setCurrentTag);
         registerClientAction(ACTION_SET_SETTING, TaggerSetting.class, this::setSetting);
         registerClientAction(ACTION_SAVE_TAG, PatternProviderTag.class, this::saveTag);
+        registerClientAction(ACTION_DELETE_TAG, PatternProviderTag.class, this::deleteTag);
     }
 
-    public void setTag(PatternProviderTag tag) {
-        LogUtils.getLogger().debug("setTag:{}", tag);
-        this.tag = tag;
-        iHost.set(ComponentRegisters.PATTERN_PROVIDER_TAG, tag);
-        if (isClientSide()) {
-            sendClientAction(ACTION_SET_TAG, tag);
-        }else {
-
-        }
-    }
+//    public void setTag(PatternProviderTag tag) {
+//        LogUtils.getLogger().debug("setTag:{}", tag);
+//        this.tag = tag;
+//        iHost.set(ComponentRegisters.PATTERN_PROVIDER_TAG, tag);
+//        if (isClientSide()) {
+//            sendClientAction(ACTION_SET_TAG, tag);
+//        }else {
+//
+//        }
+//    }
 
     public void setSetting(TaggerSetting taggerSetting) {
         LogUtils.getLogger().debug("TaggerSetting:{}", taggerSetting);
@@ -79,6 +81,15 @@ public class TaggerMenu extends AEBaseMenu implements ITagsProvider {
         }else {
         }
     }
+
+//    public void deleteTag(PatternProviderTag tag) {
+//        LogUtils.getLogger().debug("deleteTag:{}", tag);
+//        removeTag(tag);
+//        if (isClientSide()) {
+//            sendClientAction(ACTION_DELETE_TAG, tag);
+//        }else {
+//        }
+//    }
 
     public ItemMenuHost<?> getHost() {
         return host;
@@ -114,6 +125,7 @@ public class TaggerMenu extends AEBaseMenu implements ITagsProvider {
         tags = new LinkedList<>(tags);
         tags.remove(tag);
         iHost.set(ComponentRegisters.SAVED_TAGS, tags);
+        saved_tags = tags;
         return true;
     }
 
@@ -126,7 +138,24 @@ public class TaggerMenu extends AEBaseMenu implements ITagsProvider {
 
     @Override
     public void setCurrentTag(PatternProviderTag tag) {
-        setTag(tag);
+        LogUtils.getLogger().debug("setTag:{}", tag);
+        this.tag = tag;
+        iHost.set(ComponentRegisters.PATTERN_PROVIDER_TAG, tag);
+        if (isClientSide()) {
+            sendClientAction(ACTION_SET_TAG, tag);
+        }else {
+
+        }
+    }
+
+    @Override
+    public void deleteTag(PatternProviderTag tag) {
+        LogUtils.getLogger().debug("deleteTag:{}", tag);
+        removeTag(tag);
+        if (isClientSide()) {
+            sendClientAction(ACTION_DELETE_TAG, tag);
+        }else {
+        }
     }
 }
 

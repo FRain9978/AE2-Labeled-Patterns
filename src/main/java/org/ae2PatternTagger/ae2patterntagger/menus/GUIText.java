@@ -8,13 +8,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public enum GUIText implements LocalizationEnum {
-    TaggerInputPlaceHolder("enter tag name here", "输入标签名称"),
+    TaggerInputPlaceHolder("type tag name here", "请输入标签名称"),
     TaggerTitle("Tagger", "标签工具"),
     TaggerEditConfirm("Confirm", "确认"),
     TaggerEditSave("Save", "保存"),
     TaggerEditLock("Lock Edit", "输入锁定"),
     TaggerEditLockHint("Block the input field for editing", "锁定输入框不允许编辑"),
-    TaggerListTitle("Tag List", "标签列表"),
+    TaggerListTitle("Saved Tags", "保存的标签"),
     TaggerListSelect("Select", "选择"),
     TaggerListDelete("Delete", "删除"),
     ;

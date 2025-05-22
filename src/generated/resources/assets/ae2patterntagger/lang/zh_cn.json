@@ -5,10 +5,10 @@
   "gui.ae2patterntagger.taggereditlock": "输入锁定",
   "gui.ae2patterntagger.taggereditlockhint": "锁定输入框不允许编辑",
   "gui.ae2patterntagger.taggereditsave": "保存",
-  "gui.ae2patterntagger.taggerinputplaceholder": "输入标签名称",
+  "gui.ae2patterntagger.taggerinputplaceholder": "请输入标签名称",
   "gui.ae2patterntagger.taggerlistdelete": "删除",
   "gui.ae2patterntagger.taggerlistselect": "选择",
-  "gui.ae2patterntagger.taggerlisttitle": "标签列表",
+  "gui.ae2patterntagger.taggerlisttitle": "保存的标签",
   "gui.ae2patterntagger.taggertitle": "标签工具",
   "item.ae2patterntagger.my_item": "我的物品",
   "item.ae2patterntagger.tagger": "标签工具"
