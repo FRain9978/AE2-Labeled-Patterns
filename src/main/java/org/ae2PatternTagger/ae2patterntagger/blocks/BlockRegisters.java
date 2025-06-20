@@ -52,7 +52,7 @@ public class BlockRegisters {
 
 //    private static <T extends BlockEntity> DeferredBlockEntityType<T> registerBlockEntity
 //            (String name, BlockEntityType.BlockEntitySupplier<? extends T> factory, Block block){
-//        return BLOCK_ENTITY_TYPES.register(
+//        return BLOCK_ENTITY_TYPES.registerModels(
 //                name,
 //                () -> BlockEntityType.Builder.of(factory, block).build(null));
 //    }

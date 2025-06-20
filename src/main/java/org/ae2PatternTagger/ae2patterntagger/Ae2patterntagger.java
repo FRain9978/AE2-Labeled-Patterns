@@ -36,6 +36,8 @@ import org.ae2PatternTagger.ae2patterntagger.items.ItemRegisters;
 import org.ae2PatternTagger.ae2patterntagger.items.components.ComponentRegisters;
 import org.ae2PatternTagger.ae2patterntagger.menus.InitScreens;
 import org.ae2PatternTagger.ae2patterntagger.menus.MenuRegisters;
+import org.ae2PatternTagger.ae2patterntagger.network.InitNetwork;
+import org.ae2PatternTagger.ae2patterntagger.parts.PartRegisters;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
@@ -65,6 +67,7 @@ public class Ae2patterntagger {
                     .displayItems((parameters, output) -> {
                         output.accept(ItemRegisters.TAGGER.get());
                         output.accept(BlockRegisters.MY_BLOCK.get());
+                        output.accept(PartRegisters.ADVANCED_PATTERN_ACCESS_TERMINAL.get());
     }).build());
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
@@ -87,8 +90,12 @@ public class Ae2patterntagger {
 
         MenuRegisters.MENUS.register(modEventBus);
 
+        modEventBus.addListener(InitNetwork::init);
+
         modEventBus.addListener(InitCapabilities::register);
         modEventBus.addListener(InitScreens::register);
+        modEventBus.addListener(PartRegisters::registerModels);
+        PartRegisters.PARTS.register(modEventBus);
 
         // Register the Deferred Register to the mod event bus so tabs get registered
         CREATIVE_MODE_TABS.register(modEventBus);
@@ -132,7 +139,7 @@ public class Ae2patterntagger {
         LOGGER.info("HELLO from server starting");
     }
 
-    // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
+    // You can use EventBusSubscriber to automatically registerModels all static methods in the class annotated with @SubscribeEvent
     @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents {
         @SubscribeEvent

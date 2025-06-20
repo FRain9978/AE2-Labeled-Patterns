@@ -115,6 +115,7 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 dependencies {
     // compileOnly "org.appliedenergistics:appliedenergistics2:19.2.4:api"
     implementation "org.appliedenergistics:appliedenergistics2:19.2.4"
+    implementation "org.appliedenergistics:guideme:21.1.1"
     localRuntimeOnly "dev.emi:emi-neoforge:${emi_version}"
     localRuntimeOnly "curse.maven:jade-324717:${jade_id}"
     // Example mod dependency with JEI

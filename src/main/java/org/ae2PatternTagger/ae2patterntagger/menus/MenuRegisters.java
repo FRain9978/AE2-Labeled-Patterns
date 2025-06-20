@@ -18,6 +18,8 @@ public class MenuRegisters {
 
 //    public static final Supplier<MenuType<TaggerMenu>> TAGGER_MENU = registerMenuType("tagger", TaggerMenu.TYPE);
     public static final Supplier<MenuType<TaggerMenu>> TAGGER_MENU = MENUS.register("tagger", () -> TaggerMenu.TYPE);
+    public static final Supplier<MenuType<AdvancedPatternAccessTerminalMenu>> ADVANCED_PATTERN_ACCESS_TERMINAL_MENU =
+            MENUS.register("advanced_pattern_access_terminal", () -> AdvancedPatternAccessTerminalMenu.TYPE);
 
     private static <T extends AbstractContainerMenu> DeferredHolder<MenuType<?>, MenuType<T>> registerMenuType(String name,
                                                                                                                IContainerFactory<T> factory) {
