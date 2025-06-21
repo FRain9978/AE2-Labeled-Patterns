@@ -7,12 +7,15 @@ import appeng.api.implementations.menuobjects.ItemMenuHost;
 import appeng.api.storage.ISubMenuHost;
 import appeng.api.util.IConfigManager;
 import appeng.api.util.IConfigurableObject;
+import appeng.blockentity.crafting.PatternProviderBlockEntity;
+import appeng.helpers.patternprovider.PatternProviderLogicHost;
 import appeng.menu.ISubMenu;
 import appeng.menu.MenuOpener;
 import appeng.menu.locator.ItemMenuHostLocator;
 import appeng.menu.locator.MenuLocators;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -22,11 +25,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 import org.ae2PatternTagger.ae2patterntagger.MSettings;
+import org.ae2PatternTagger.ae2patterntagger.blocks.attachments.AttachmentRegisters;
 import org.ae2PatternTagger.ae2patterntagger.items.components.ComponentRegisters;
 import org.ae2PatternTagger.ae2patterntagger.items.components.PatternProviderTag;
 import org.ae2PatternTagger.ae2patterntagger.menus.TaggerMenu;
+import org.ae2PatternTagger.ae2patterntagger.network.SaveTagAttachmentPacket;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -56,6 +62,7 @@ public class TaggerItem extends Item implements IMenuItem, IConfigurableObject {
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level level, @NotNull Player player, @NotNull InteractionHand usedHand) {
 //        player.sendSystemMessage(Component.literal("use item"));
+        if (player.isCrouching()) return InteractionResultHolder.pass(player.getItemInHand(usedHand));
         if (!level.isClientSide()) {
             MenuOpener.open(TaggerMenu.TYPE, player, MenuLocators.forHand(player, usedHand));
         }
@@ -66,50 +73,38 @@ public class TaggerItem extends Item implements IMenuItem, IConfigurableObject {
 
     @Override
     public @NotNull InteractionResult useOn(@NotNull UseOnContext context) {
-//        Level level = context.getLevel();
-//        BlockEntity blockEntity = level.getBlockEntity(context.getClickedPos());
-//        Player player = context.getPlayer();
-//        if (player == null) return InteractionResult.PASS;
-//        player.sendSystemMessage(Component.literal("use on item"));
-//
-//        if (blockEntity instanceof PatternProviderBlockEntity){
-//            if (level.isClientSide){
-//                return InteractionResult.sidedSuccess(true);
-//            }
-//            boolean hasTag = blockEntity.hasData(AttachmentRegisters.PATTERN_PROVIDER_TAG);
-//            if (player.isCrouching()) {
-//                if (hasTag){
-//                    var data = blockEntity.getData(AttachmentRegisters.PATTERN_PROVIDER_TAG);
-//                    player.sendSystemMessage(
-//                            Component.literal(
-//                                    String.format("block %s has tag data\n data is %s and %s",
-//                                            ((PatternProviderBlockEntity) blockEntity).getName(),data.name(), data.color())));
-//                }else {
-//                    player.sendSystemMessage(Component.literal("no tag data found!"));
-//                    ItemStack itemStack = context.getItemInHand();
-//                    if (itemStack.getItem() instanceof TaggerItem){
-//                        var selfData = itemStack.getComponents().getOrDefault(ComponentRegisters.PATTERN_PROVIDER_TAG.get(), new PatternProviderTag("sample"));
-//                        if (selfData != null) {
-//                            var name = selfData.name();
-//                            if (name.isBlank()) {return InteractionResult.CONSUME;}
-//                            blockEntity.setData(AttachmentRegisters.PATTERN_PROVIDER_TAG, new PatternProviderTag(selfData));
-//                            player.sendSystemMessage(Component.literal(String.format("successfully set tag!\n tag is %s", selfData.name())));
-//                        }
-//                    }
-//                }
-//            }else {
-//                ItemStack itemStack = context.getItemInHand();
-//                if (itemStack.getItem() instanceof TaggerItem){
-//                    var selfData = itemStack.getComponents().getOrDefault(ComponentRegisters.PATTERN_PROVIDER_TAG.get(), new PatternProviderTag("sample"));
-//                    if (selfData != null) {
-//                        var name = selfData.name();
-//                        if (name.isBlank()) {return InteractionResult.CONSUME;}
-//                        blockEntity.setData(AttachmentRegisters.PATTERN_PROVIDER_TAG, new PatternProviderTag(selfData));
-//                        player.sendSystemMessage(Component.literal(String.format("successfully set tag!\n tag is %s", selfData.name())));
-//                    }
-//                }
-//            }
-//        }
+        Level level = context.getLevel();
+        BlockEntity blockEntity = level.getBlockEntity(context.getClickedPos());
+        Player player = context.getPlayer();
+        if (player == null) return InteractionResult.PASS;
+        if (blockEntity instanceof PatternProviderLogicHost){
+            if (blockEntity.hasData(AttachmentRegisters.PATTERN_PROVIDER_TAG)){
+                player.sendSystemMessage(Component.literal("-----------------"));
+                player.sendSystemMessage(Component.literal("Client: " + level.isClientSide));
+                player.sendSystemMessage(Component.literal("Content: "+ blockEntity.getData(AttachmentRegisters.PATTERN_PROVIDER_TAG).name()));
+                player.sendSystemMessage(Component.literal("Color: "+ blockEntity.getData(AttachmentRegisters.PATTERN_PROVIDER_TAG).color().toString()));
+                player.sendSystemMessage(Component.literal("-----------------"));
+            }
+            if (level.isClientSide){
+                return InteractionResult.sidedSuccess(true);
+            }
+            ServerPlayer serverPlayer = (ServerPlayer) player;
+            if (player.isCrouching()){
+                ItemStack itemStack = context.getItemInHand();
+                if (itemStack.getItem() instanceof TaggerItem){
+                    var hasTag = itemStack.has(ComponentRegisters.PATTERN_PROVIDER_TAG.get());
+                    if (hasTag){
+                        var tag = itemStack.getComponents().get(ComponentRegisters.PATTERN_PROVIDER_TAG.get());
+                        var data = blockEntity.getData(AttachmentRegisters.PATTERN_PROVIDER_TAG);
+                        if (tag != null && !tag.equals(data)) {
+                            blockEntity.setData(AttachmentRegisters.PATTERN_PROVIDER_TAG, tag);
+                            serverPlayer.connection.send(
+                                    new SaveTagAttachmentPacket(tag, blockEntity.getBlockPos()));
+                        }
+                    }
+                }
+            }
+        }
         return super.useOn(context);
     }
 
