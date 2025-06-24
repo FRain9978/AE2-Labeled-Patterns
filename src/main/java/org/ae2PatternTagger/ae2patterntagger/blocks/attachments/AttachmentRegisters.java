@@ -15,7 +15,7 @@ public class AttachmentRegisters {
 
     public static final Supplier<AttachmentType<PatternProviderTag>> PATTERN_PROVIDER_TAG = ATTACHMENTS.register(
             "pattern_provider_tag", () -> AttachmentType.builder(
-                    () -> new PatternProviderTag("new", Color.parse("#fffffff")))
+                    () -> PatternProviderTag.Empty)
                     .serialize(PatternProviderTag.CODEC)
                     .build()
     );

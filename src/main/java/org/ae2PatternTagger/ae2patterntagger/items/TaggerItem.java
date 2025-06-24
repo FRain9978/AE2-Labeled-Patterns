@@ -102,6 +102,7 @@ public class TaggerItem extends Item implements IMenuItem, IConfigurableObject {
                                     new SaveTagAttachmentPacket(tag, blockEntity.getBlockPos()));
                         }
                     }
+                    return InteractionResult.sidedSuccess(false);
                 }
             }
         }

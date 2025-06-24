@@ -8,11 +8,11 @@ import appeng.api.inventories.InternalInventory;
 import appeng.api.networking.IGrid;
 import appeng.api.networking.IGridNode;
 import appeng.api.storage.ILinkStatus;
-import appeng.api.storage.IPatternAccessTermMenuHost;
 import appeng.core.AELog;
 import appeng.core.network.clientbound.SetLinkStatusPacket;
 import appeng.helpers.InventoryAction;
 import appeng.helpers.patternprovider.PatternContainer;
+import appeng.helpers.patternprovider.PatternProviderLogicHost;
 import appeng.menu.AEBaseMenu;
 import appeng.menu.guisync.GuiSync;
 import appeng.menu.guisync.LinkStatusAwareMenu;
@@ -20,6 +20,7 @@ import appeng.menu.implementations.MenuTypeBuilder;
 import appeng.util.inv.AppEngInternalInventory;
 import appeng.util.inv.FilteredInternalInventory;
 import appeng.util.inv.filter.IAEItemFilter;
+import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -29,34 +30,42 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import org.ae2PatternTagger.ae2patterntagger.Ae2patterntagger;
+import org.ae2PatternTagger.ae2patterntagger.blocks.attachments.AttachmentRegisters;
+import org.ae2PatternTagger.ae2patterntagger.items.components.PatternProviderTag;
 import org.ae2PatternTagger.ae2patterntagger.network.AdvancedPatternAccessTerminalPacket;
 import org.ae2PatternTagger.ae2patterntagger.network.ClearAdvancedPatternAccessTerminalPacket;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class AdvancedPatternAccessTerminalMenu extends AEBaseMenu implements LinkStatusAwareMenu {
-    private final IPatternAccessTermMenuHost host;
+public class AdvancedPatternAccessTerminalMenu extends AEBaseMenu implements LinkStatusAwareMenu, ITagsProvider {
+    private final IAdvancedPatternAccessTermMenuHost host;
     @GuiSync(1)
     public ShowPatternProviders showPatternProviders;
     private ILinkStatus linkStatus;
     public static final MenuType<AdvancedPatternAccessTerminalMenu> TYPE = MenuTypeBuilder
-            .create(AdvancedPatternAccessTerminalMenu::new, IPatternAccessTermMenuHost.class)
+            .create(AdvancedPatternAccessTerminalMenu::new, IAdvancedPatternAccessTermMenuHost.class)
             .buildUnregistered(Ae2patterntagger.makeId("advancedpatternaccessterminal"));
     private static long inventorySerial = Long.MIN_VALUE;
     private final Map<PatternContainer, ContainerTracker> diList;
     private final Long2ObjectOpenHashMap<ContainerTracker> byId;
     private final Set<PatternContainer> pinnedHosts;
 
+    private static final String ACTION_CYCLE_TAG = "cycleTag";
+    @GuiSync(2)
+    public PatternProviderTag currentTag = PatternProviderTag.Empty;
+
+    public HashSet<PatternProviderTag> allTagTypes = new HashSet<>();
+
     public ShowPatternProviders getShownProviders() {
         return this.showPatternProviders;
     }
 
-    public AdvancedPatternAccessTerminalMenu(int id, Inventory ip, IPatternAccessTermMenuHost anchor) {
+    public AdvancedPatternAccessTerminalMenu(int id, Inventory ip, IAdvancedPatternAccessTermMenuHost anchor) {
         this(TYPE, id, ip, anchor, true);
     }
 
-    public AdvancedPatternAccessTerminalMenu(MenuType<?> menuType, int id, Inventory ip, IPatternAccessTermMenuHost host, boolean bindInventory) {
+    public AdvancedPatternAccessTerminalMenu(MenuType<?> menuType, int id, Inventory ip, IAdvancedPatternAccessTermMenuHost host, boolean bindInventory) {
         super(menuType, id, ip, host);
         this.showPatternProviders = ShowPatternProviders.VISIBLE;
         this.linkStatus = ILinkStatus.ofDisconnected();
@@ -68,11 +77,14 @@ public class AdvancedPatternAccessTerminalMenu extends AEBaseMenu implements Lin
             this.createPlayerInventorySlots(ip);
         }
 
+        registerClientAction(ACTION_CYCLE_TAG, Boolean.class, this::cycleTag);
+
     }
 
     public void broadcastChanges() {
         if (!this.isClientSide()) {
             this.showPatternProviders = (ShowPatternProviders)this.host.getConfigManager().getSetting(Settings.TERMINAL_SHOW_PATTERN_PROVIDERS);
+            this.currentTag = this.host.getCurrentTag();
             super.broadcastChanges();
             this.updateLinkStatus();
             if (this.showPatternProviders != ShowPatternProviders.NOT_FULL) {
@@ -140,13 +152,35 @@ public class AdvancedPatternAccessTerminalMenu extends AEBaseMenu implements Lin
                 if (this.getShownProviders() == ShowPatternProviders.NOT_FULL) {
                     this.pinnedHosts.add(container);
                 }
-
-                ContainerTracker t = (ContainerTracker)this.diList.get(container);
-                if (t == null || !t.group.equals(container.getTerminalGroup())) {
-                    state.forceFullUpdate = true;
+                if (container instanceof PatternProviderLogicHost) {
+                    var entity = ((PatternProviderLogicHost) container).getBlockEntity();
+                    var tagData = entity != null ? entity.getData(AttachmentRegisters.PATTERN_PROVIDER_TAG) : null;
+                    if (tagData != null && !tagData.isEmpty()) {
+                        if (currentTag != null && !currentTag.isEmpty()){
+                            if (tagData.equals(currentTag)) {
+                                ContainerTracker t = (ContainerTracker) this.diList.get(container);
+                                if (t == null || !t.group.equals(container.getTerminalGroup())) {
+                                    state.forceFullUpdate = true;
+                                }
+                                ++state.total;
+                            }
+                        }else{
+                            ContainerTracker t = (ContainerTracker) this.diList.get(container);
+                            if (t == null || !t.group.equals(container.getTerminalGroup())) {
+                                state.forceFullUpdate = true;
+                            }
+                            ++state.total;
+                        }
+                    } else{
+                        if (currentTag == null || currentTag.isEmpty()){
+                            ContainerTracker t = (ContainerTracker) this.diList.get(container);
+                            if (t == null || !t.group.equals(container.getTerminalGroup())) {
+                                state.forceFullUpdate = true;
+                            }
+                            ++state.total;
+                        }
+                    }
                 }
-
-                ++state.total;
             }
         }
 
@@ -230,6 +264,7 @@ public class AdvancedPatternAccessTerminalMenu extends AEBaseMenu implements Lin
     private void sendFullUpdate(@Nullable IGrid grid) {
         this.byId.clear();
         this.diList.clear();
+        this.allTagTypes.clear();
         this.sendPacketToClient(new ClearAdvancedPatternAccessTerminalPacket());
         if (grid != null) {
             for(Class<?> machineClass : grid.getMachineClasses()) {
@@ -237,7 +272,25 @@ public class AdvancedPatternAccessTerminalMenu extends AEBaseMenu implements Lin
                 if (containerClass != null) {
                     for(PatternContainer container : grid.getActiveMachines(containerClass)) {
                         if (this.isVisible(container)) {
-                            this.diList.put(container, new ContainerTracker(container, container.getTerminalPatternInventory(), container.getTerminalGroup()));
+//                            this.diList.put(container, new ContainerTracker(container, container.getTerminalPatternInventory(), container.getTerminalGroup()));
+                            if (container instanceof PatternProviderLogicHost) {
+                                var entity = ((PatternProviderLogicHost) container).getBlockEntity();
+                                var tagData = entity != null ? entity.getData(AttachmentRegisters.PATTERN_PROVIDER_TAG) : null;
+                                if (tagData != null && !tagData.isEmpty()) {
+                                    allTagTypes.add(tagData);
+                                    if (currentTag != null && !currentTag.isEmpty()){
+                                        if (tagData.equals(currentTag)) {
+                                            this.diList.put(container, new ContainerTracker(container, container.getTerminalPatternInventory(), container.getTerminalGroup()));
+                                        }
+                                    }else{
+                                        this.diList.put(container, new ContainerTracker(container, container.getTerminalPatternInventory(), container.getTerminalGroup()));
+                                    }
+                                }else{
+                                    if (currentTag == null || currentTag.isEmpty()){
+                                        this.diList.put(container, new ContainerTracker(container, container.getTerminalPatternInventory(), container.getTerminalGroup()));
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -247,7 +300,6 @@ public class AdvancedPatternAccessTerminalMenu extends AEBaseMenu implements Lin
                 this.byId.put(inv.serverId, inv);
                 this.sendPacketToClient(inv.createFullPacket());
             }
-
         }
     }
 
@@ -276,6 +328,59 @@ public class AdvancedPatternAccessTerminalMenu extends AEBaseMenu implements Lin
 
     public void setLinkStatus(ILinkStatus linkStatus) {
         this.linkStatus = linkStatus;
+    }
+
+    @Override
+    public List<PatternProviderTag> getTags() {
+        return new ArrayList<>(allTagTypes);
+    }
+
+    @Override
+    public PatternProviderTag currentTag() {
+        return currentTag;
+    }
+
+    @Override
+    public boolean hasTag(PatternProviderTag tag) {
+        return allTagTypes.contains(tag);
+    }
+
+    @Override
+    public void setCurrentTag(PatternProviderTag tag) {
+        host.setCurrentTag(tag);
+    }
+
+    public void cycleTag(boolean isRightClick){
+        LogUtils.getLogger().debug("cycleTag:\ncurrent: {}\nallTagTypes: {}\nisRightClick: {}", currentTag, allTagTypes, isRightClick);
+        LogUtils.getLogger().debug("idList: {}", diList.keySet());
+        if (isClientSide()){
+            sendClientAction(ACTION_CYCLE_TAG, isRightClick);
+            return;
+        }
+        if (currentTag != null && !currentTag.isEmpty()){
+            List<PatternProviderTag> tags = new ArrayList<>(allTagTypes);
+            if (tags.isEmpty()) {
+                return;
+            }
+            int currentIndex = tags.indexOf(currentTag);
+            if (currentIndex == -1 && isRightClick) {
+                currentIndex = tags.size(); // if current tag is not found, we set it to the last or first tag based on right-click
+            }
+            // when right-clicking, we want to go to the previous tag, otherwise we go to the next tag, but when index is out of bounds, I want to set it to empty
+//            int nextIndex = !isRightClick ? (currentIndex + 1) % tags.size() : (currentIndex - 1 + tags.size()) % tags.size();
+            int nextIndex = isRightClick ? currentIndex - 1 : currentIndex + 1 ;
+            if (nextIndex < 0 || nextIndex >= tags.size()) {
+                setCurrentTag(PatternProviderTag.Empty);
+                return;
+            }
+
+            PatternProviderTag nextTag = tags.get(nextIndex);
+            setCurrentTag(nextTag);
+        } else {
+            if (!allTagTypes.isEmpty()) {
+                setCurrentTag(allTagTypes.iterator().next());
+            }
+        }
     }
 
     private static class VisitorState {

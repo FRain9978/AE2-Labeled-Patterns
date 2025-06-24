@@ -1,27 +1,15 @@
-package org.ae2PatternTagger.ae2patterntagger.menus;
+package org.ae2PatternTagger.ae2patterntagger.config;
 
 import appeng.core.localization.LocalizationEnum;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.ae2PatternTagger.ae2patterntagger.Ae2patterntagger;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public enum GUIText implements LocalizationEnum {
-    TaggerInputPlaceHolder("type tag name here", "请输入标签名称"),
-    TaggerTitle("Tagger", "标签工具"),
-    TaggerEditConfirm("Confirm", "确认"),
-    TaggerEditSave("Save", "保存"),
-    TaggerEditLock("Lock Edit", "输入锁定"),
-    TaggerEditLockHint("Block the input field for editing", "锁定输入框不允许编辑"),
-    TaggerListTitle("Saved Tags", "保存的标签"),
-    TaggerListSelect("Select", "选择"),
-    TaggerListDelete("Delete", "删除"),
-    AdvancedTerminalCycleTagButtonMessage("Tag Filter ", "标签过滤"),
-    AdvancedTerminalCycleTagButtonEmptyFocus("No Focusing tag", "无关注标签"),
-    AdvancedTerminalCycleTagButtonFocusing("Focusing: %s, Color: %s", "当前: %s, 颜色: %s"),
+public enum InGameTooltip implements LocalizationEnum {
+    PatternProviderTag("Tag name: %s, Color: %s","标签: %s，颜色: %s"),
     ;
-    private final String root = "gui." + Ae2patterntagger.MODID;
+    private final String root = "waila." + Ae2patterntagger.MODID;
 
     @NotNull
     private final String englishText;
@@ -30,13 +18,13 @@ public enum GUIText implements LocalizationEnum {
 
     private final Component text;
 
-    GUIText(@NotNull String englishText) {
+    InGameTooltip(@NotNull String englishText) {
         this.englishText = englishText;
         this.chineseText = englishText;
         this.text = Component.translatable(getTranslationKey());
     }
 
-    GUIText(@NotNull String englishText, String chineseText) {
+    InGameTooltip(@NotNull String englishText, String chineseText) {
         this.englishText = englishText;
         this.chineseText = chineseText;
         this.text = Component.translatable(getTranslationKey());

@@ -9,9 +9,13 @@ public interface ITagsProvider {
 
     PatternProviderTag currentTag();
 
-    boolean addTag(PatternProviderTag tag);
+    default boolean addTag(PatternProviderTag tag){
+        return false;
+    }
 
-    boolean removeTag(PatternProviderTag tag);
+    default boolean removeTag(PatternProviderTag tag){
+        return false;
+    }
 
     boolean hasTag(PatternProviderTag tag);
 
@@ -21,5 +25,7 @@ public interface ITagsProvider {
 
     void setCurrentTag(PatternProviderTag tag);
 
-    void deleteTag(PatternProviderTag tag);
+    default void deleteTag(PatternProviderTag tag) {
+        removeTag(tag);
+    }
 }

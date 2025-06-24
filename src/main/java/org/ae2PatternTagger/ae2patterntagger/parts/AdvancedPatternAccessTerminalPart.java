@@ -19,9 +19,11 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import org.ae2PatternTagger.ae2patterntagger.items.components.PatternProviderTag;
 import org.ae2PatternTagger.ae2patterntagger.menus.AdvancedPatternAccessTerminalMenu;
+import org.ae2PatternTagger.ae2patterntagger.menus.IAdvancedPatternAccessTermMenuHost;
 
-public class AdvancedPatternAccessTerminalPart extends AbstractDisplayPart implements IPatternAccessTermMenuHost {
+public class AdvancedPatternAccessTerminalPart extends AbstractDisplayPart implements IAdvancedPatternAccessTermMenuHost {
     @PartModels
     public static final ResourceLocation MODEL_OFF = AppEng.makeId("part/pattern_access_terminal_off");
     @PartModels
@@ -30,6 +32,8 @@ public class AdvancedPatternAccessTerminalPart extends AbstractDisplayPart imple
     public static final IPartModel MODELS_ON;
     public static final IPartModel MODELS_HAS_CHANNEL;
     private final IConfigManager configManager;
+
+    private PatternProviderTag currentTag = PatternProviderTag.Empty;
 
     public AdvancedPatternAccessTerminalPart(IPartItem<?> partItem) {
         super(partItem, true);
@@ -55,11 +59,15 @@ public class AdvancedPatternAccessTerminalPart extends AbstractDisplayPart imple
     public void writeToNBT(CompoundTag tag, HolderLookup.Provider registries) {
         super.writeToNBT(tag, registries);
         this.configManager.writeToNBT(tag, registries);
+        if (this.currentTag != null && !this.currentTag.isEmpty()) {
+            this.currentTag.writeToNBT(tag);
+        }
     }
 
     public void readFromNBT(CompoundTag tag, HolderLookup.Provider registries) {
         super.readFromNBT(tag, registries);
         this.configManager.readFromNBT(tag, registries);
+        this.currentTag = PatternProviderTag.readFromNBT(tag);
     }
 
     public ILinkStatus getLinkStatus() {
@@ -70,5 +78,18 @@ public class AdvancedPatternAccessTerminalPart extends AbstractDisplayPart imple
         MODELS_OFF = new PartModel(MODEL_BASE, MODEL_OFF, MODEL_STATUS_OFF);
         MODELS_ON = new PartModel(MODEL_BASE, MODEL_ON, MODEL_STATUS_ON);
         MODELS_HAS_CHANNEL = new PartModel(MODEL_BASE, MODEL_ON, MODEL_STATUS_HAS_CHANNEL);
+    }
+
+    @Override
+    public PatternProviderTag getCurrentTag() {
+        return currentTag;
+    }
+
+    @Override
+    public void setCurrentTag(PatternProviderTag tag) {
+        if (tag != null && !tag.equals(currentTag)) {
+            this.currentTag = tag;
+            this.getHost().markForSave();
+        }
     }
 }

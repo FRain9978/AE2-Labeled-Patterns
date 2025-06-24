@@ -1,13 +1,17 @@
 package org.ae2PatternTagger.ae2patterntagger.items.components;
 
 import appeng.client.gui.style.Color;
+import appeng.menu.guisync.PacketWritable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
-public record PatternProviderTag(String name, Color color) {
+public record PatternProviderTag(String name, Color color) implements PacketWritable {
     public PatternProviderTag(String name, int r, int g, int b, int a){
         this(name, new Color(r,g,b,a));
     }
@@ -17,15 +21,23 @@ public record PatternProviderTag(String name, Color color) {
     }
 
     public PatternProviderTag(String name){
-        this(name,"#ffffffff");
+        this(name,"#00000000");
     }
 
     public PatternProviderTag(){
         this("");
     }
 
+    public PatternProviderTag(RegistryFriendlyByteBuf data){
+        this(STREAM_CODEC.decode(data));
+    }
+
     public PatternProviderTag(PatternProviderTag other){
         this(other.name, new Color(other.color.getR(), other.color.getG(), other.color.getB(), other.color.getA()));
+    }
+
+    public boolean isEmpty() {
+        return this.equals(Empty);
     }
 
     public int getColorR(){
@@ -59,4 +71,28 @@ public record PatternProviderTag(String name, Color color) {
             ByteBufCodecs.INT, PatternProviderTag::getColorB,
             PatternProviderTag::new
     );
+
+    public void writeToNBT(CompoundTag tag){
+        tag.putString("pattern_provider_tag_name", name);
+        tag.putInt("pattern_provider_tag_colorR", getColorR());
+        tag.putInt("pattern_provider_tag_colorG", getColorG());
+        tag.putInt("pattern_provider_tag_colorB", getColorB());
+        tag.putInt("pattern_provider_tag_colorA", getColorA());
+    }
+
+    public static PatternProviderTag readFromNBT(CompoundTag tag){
+        String name = tag.getString("pattern_provider_tag_name");
+        int r = tag.getInt("pattern_provider_tag_colorR");
+        int g = tag.getInt("pattern_provider_tag_colorG");
+        int b = tag.getInt("pattern_provider_tag_colorB");
+        int a = tag.getInt("pattern_provider_tag_colorA");
+        return new PatternProviderTag(name, r, g, b, a);
+    }
+
+    @Override
+    public void writeToPacket(RegistryFriendlyByteBuf data) {
+        STREAM_CODEC.encode(data, this);
+    }
+
+    public static final PatternProviderTag Empty = new PatternProviderTag("", 0, 0, 0, 0); // Default empty tag with black transparent color
 }

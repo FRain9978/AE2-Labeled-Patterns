@@ -9,6 +9,7 @@ import appeng.api.implementations.blockentities.PatternContainerGroup;
 import appeng.api.stacks.GenericStack;
 import appeng.api.storage.ILinkStatus;
 import appeng.client.gui.AEBaseScreen;
+import appeng.client.gui.Icon;
 import appeng.client.gui.me.patternaccess.PatternContainerRecord;
 import appeng.client.gui.me.patternaccess.PatternSlot;
 import appeng.client.gui.style.PaletteColor;
@@ -22,7 +23,6 @@ import appeng.core.AppEng;
 import appeng.core.localization.GuiText;
 import appeng.core.network.serverbound.InventoryActionPacket;
 import appeng.helpers.InventoryAction;
-import appeng.menu.implementations.PatternAccessTermMenu;
 import appeng.util.inv.AppEngInternalInventory;
 import com.google.common.collect.HashMultimap;
 import guideme.color.ConstantColor;
@@ -32,6 +32,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.locale.Language;
@@ -46,6 +47,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.ae2PatternTagger.ae2patterntagger.menus.widgets.MActionButton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,6 +85,7 @@ public class AdvancedPatternAccessTerminalScreen extends AEBaseScreen<AdvancedPa
     private final Map<ItemStack, String> patternSearchText = new WeakHashMap();
     private int visibleRows = 0;
     private final ServerSettingToggleButton<ShowPatternProviders> showPatternProviders;
+    private final MActionButton cycleTagButton;
 
     public AdvancedPatternAccessTerminalScreen(AdvancedPatternAccessTerminalMenu menu, Inventory playerInventory, Component title, ScreenStyle style) {
         super(menu, playerInventory, title, style);
@@ -95,6 +98,14 @@ public class AdvancedPatternAccessTerminalScreen extends AEBaseScreen<AdvancedPa
         this.searchField = this.widgets.addTextField("search");
         this.searchField.setResponder((str) -> this.refreshList());
         this.searchField.setPlaceholder(GuiText.SearchPlaceholder.text());
+
+        cycleTagButton = new MActionButton(Icon.PRIORITY,
+                (button) -> {
+                   this.menu.cycleTag(isHandlingRightClick());
+                },
+                GUIText.AdvancedTerminalCycleTagButtonMessage.text());
+        addToLeftToolbar(cycleTagButton);
+//        this.widgets.add("cycleTagButton", cycleTagButton);
     }
 
     public void init() {
@@ -336,6 +347,10 @@ public class AdvancedPatternAccessTerminalScreen extends AEBaseScreen<AdvancedPa
 
     public void updateBeforeRender() {
         this.showPatternProviders.set((this.menu).getShownProviders());
+        var currentTag = (this.menu).currentTag;
+        this.cycleTagButton.setExtraTooltip(List.of(currentTag.isEmpty() ?
+                GUIText.AdvancedTerminalCycleTagButtonEmptyFocus.text() :
+                GUIText.AdvancedTerminalCycleTagButtonFocusing.text(currentTag.name(), currentTag.color().toString())));
     }
 
     private void refreshList() {

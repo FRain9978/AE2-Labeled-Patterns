@@ -26,7 +26,7 @@ public class MSettings {
         try {
             return (Setting<T>) registerMethod1.invoke(null, name, enumClass);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to registerModels AE2 Setting: " + name, e);
+            throw new RuntimeException("Failed to register AE2 Setting: " + name, e);
         }
 
     }
@@ -36,7 +36,7 @@ public class MSettings {
         try {
             return (Setting<T>) registerMethod2.invoke(null, name, defalut, others);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to registerModels AE2 Setting: " + name, e);
+            throw new RuntimeException("Failed to register AE2 Setting: " + name, e);
         }
     }
 

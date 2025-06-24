@@ -1,6 +1,10 @@
 {
   "block.ae2patterntagger.my_block": "My Block",
+  "config.jade.plugin_ae2patterntagger.pattern_provider_tag": "AE2PATTERNTAGGERPattern Provider Tag",
   "creativetab.ae2patterntagger.main": "AE2 Pattern Tagger",
+  "gui.ae2patterntagger.advancedterminalcycletagbuttonemptyfocus": "No Focusing tag",
+  "gui.ae2patterntagger.advancedterminalcycletagbuttonfocusing": "Focusing: %s, Color: %s",
+  "gui.ae2patterntagger.advancedterminalcycletagbuttonmessage": "Tag Filter ",
   "gui.ae2patterntagger.taggereditconfirm": "Confirm",
   "gui.ae2patterntagger.taggereditlock": "Lock Edit",
   "gui.ae2patterntagger.taggereditlockhint": "Block the input field for editing",
@@ -11,5 +15,6 @@
   "gui.ae2patterntagger.taggerlisttitle": "Saved Tags",
   "gui.ae2patterntagger.taggertitle": "Tagger",
   "item.ae2patterntagger.my_item": "My Item",
-  "item.ae2patterntagger.tagger": "Tagger"
+  "item.ae2patterntagger.tagger": "Tagger",
+  "waila.ae2patterntagger.patternprovidertag": "Tag name: %s, Color: %s"
 }

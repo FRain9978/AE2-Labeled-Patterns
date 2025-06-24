@@ -1,9 +1,12 @@
 package org.ae2PatternTagger.ae2patterntagger.data;
 
 import net.minecraft.data.PackOutput;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 import org.ae2PatternTagger.ae2patterntagger.Ae2patterntagger;
 import org.ae2PatternTagger.ae2patterntagger.blocks.BlockRegisters;
+import org.ae2PatternTagger.ae2patterntagger.config.InGameTooltip;
+import org.ae2PatternTagger.ae2patterntagger.integration.tooltips.TooltipProviders;
 import org.ae2PatternTagger.ae2patterntagger.items.ItemRegisters;
 import org.ae2PatternTagger.ae2patterntagger.menus.GUIText;
 
@@ -18,7 +21,10 @@ public class LanguageProviders {
         protected void addTranslations() {
             this.add("creativetab.ae2patterntagger.main", "AE2标签工具");
 
-            for (var gui : GUIText.values()){
+            for (var gui: GUIText.values()){
+                this.add(gui.getTranslationKey(), gui.getChineseText());
+            }
+            for (var gui: InGameTooltip.values()){
                 this.add(gui.getTranslationKey(), gui.getChineseText());
             }
 
@@ -39,7 +45,10 @@ public class LanguageProviders {
         protected void addTranslations() {
             this.add("creativetab.ae2patterntagger.main", "AE2 Pattern Tagger");
 
-            for (var gui : GUIText.values()){
+            for (var gui: GUIText.values()){
+                this.add(gui.getTranslationKey(), gui.getEnglishText());
+            }
+            for (var gui: InGameTooltip.values()){
                 this.add(gui.getTranslationKey(), gui.getEnglishText());
             }
 
@@ -47,6 +56,12 @@ public class LanguageProviders {
 
             this.addItem(ItemRegisters.MY_ITEM, "My Item");
             this.addItem(ItemRegisters.TAGGER, "Tagger");
+
+            addJadeProviderDisplayName(TooltipProviders.PATTERN_PROVIDER_TAG, Ae2patterntagger.MODID.toUpperCase() + "Pattern Provider Tag");
+        }
+
+        private void addJadeProviderDisplayName(ResourceLocation providerId, String name) {
+            this.add("config.jade.plugin_" + providerId.getNamespace() + "." + providerId.getPath(), name);
         }
     }
 }
