@@ -47,7 +47,9 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.ae2PatternTagger.ae2patterntagger.config.QuickMoveAction;
 import org.ae2PatternTagger.ae2patterntagger.menus.widgets.MActionButton;
+import org.ae2PatternTagger.ae2patterntagger.network.InventoryQuickMovePacket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,6 +89,8 @@ public class AdvancedPatternAccessTerminalScreen extends AEBaseScreen<AdvancedPa
     private final ServerSettingToggleButton<ShowPatternProviders> showPatternProviders;
     private final MActionButton cycleTagButton;
 
+    private int firstSlotsRowIndex = -1;
+
     public AdvancedPatternAccessTerminalScreen(AdvancedPatternAccessTerminalMenu menu, Inventory playerInventory, Component title, ScreenStyle style) {
         super(menu, playerInventory, title, style);
         this.scrollbar = this.widgets.addScrollBar("scrollbar", Scrollbar.BIG);
@@ -122,6 +126,7 @@ public class AdvancedPatternAccessTerminalScreen extends AEBaseScreen<AdvancedPa
         int textColor = this.style.getColor(PaletteColor.DEFAULT_TEXT_COLOR).toARGB();
         ClientLevel level = Minecraft.getInstance().level;
         int scrollLevel = this.scrollbar.getCurrentScroll();
+        this.firstSlotsRowIndex = -1;
 
         for(int i = 0; i < this.visibleRows; ++i) {
             if (scrollLevel + i < this.rows.size()) {
@@ -129,6 +134,9 @@ public class AdvancedPatternAccessTerminalScreen extends AEBaseScreen<AdvancedPa
                 if (row instanceof SlotsRow) {
                     SlotsRow slotsRow = (SlotsRow)row;
                     PatternContainerRecord container = slotsRow.container;
+                    if (this.firstSlotsRowIndex == -1) {
+                        this.firstSlotsRowIndex = scrollLevel + i;
+                    }
 
                     for(int col = 0; col < slotsRow.slots; ++col) {
                         var slot = new PatternSlot(
@@ -260,6 +268,31 @@ public class AdvancedPatternAccessTerminalScreen extends AEBaseScreen<AdvancedPa
             }
 
         } else {
+            // check if the playerInventorySlot is a normal inventory playerInventorySlot
+            if (slot != null && slot.container == this.getMenu().getPlayerInventory()) {
+                // check if the playerInventorySlot is a pattern item
+                ItemStack stack = slot.getItem();
+                if (!stack.isEmpty() && PatternDetailsHelper.isEncodedPattern(stack)) {
+                    // check first slots row index and if it is valid
+                    // then send the slots container info to server
+                    if (this.firstSlotsRowIndex != -1 && this.firstSlotsRowIndex < this.rows.size()) {
+                        Row row = this.rows.get(this.firstSlotsRowIndex);
+                        if (row instanceof SlotsRow) {
+                            SlotsRow slotsRow = (SlotsRow) row;
+                            PatternContainerRecord container = slotsRow.container;
+                            switch (clickType){
+                                case QUICK_MOVE:
+                                    InventoryQuickMovePacket p = new InventoryQuickMovePacket(
+                                            QuickMoveAction.SINGLE,
+                                            slot.getSlotIndex(),
+                                            container.getServerId());
+                                    PacketDistributor.sendToServer(p);
+                                    return;
+                            }
+                        }
+                    }
+                }
+            }
             super.slotClicked(slot, slotIdx, mouseButton, clickType);
         }
     }

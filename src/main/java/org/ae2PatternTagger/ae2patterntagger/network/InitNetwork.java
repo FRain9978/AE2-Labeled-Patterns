@@ -19,6 +19,8 @@ public class InitNetwork {
         clientbound(registrar, AdvancedPatternAccessTerminalPacket.TYPE, AdvancedPatternAccessTerminalPacket.STREAM_CODEC);
         clientbound(registrar, SaveTagAttachmentPacket.TYPE, SaveTagAttachmentPacket.STREAM_CODEC);
 
+        serverbound(registrar, InventoryQuickMovePacket.TYPE, InventoryQuickMovePacket.STREAM_CODEC);
+
         // Serverbound
 //        serverbound(registrar, ColorApplicatorSelectColorPacket.TYPE, ColorApplicatorSelectColorPacket.STREAM_CODEC);
 

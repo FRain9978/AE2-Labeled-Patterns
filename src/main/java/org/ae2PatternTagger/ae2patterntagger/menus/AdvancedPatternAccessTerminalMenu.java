@@ -31,6 +31,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import org.ae2PatternTagger.ae2patterntagger.Ae2patterntagger;
 import org.ae2PatternTagger.ae2patterntagger.blocks.attachments.AttachmentRegisters;
+import org.ae2PatternTagger.ae2patterntagger.config.QuickMoveAction;
 import org.ae2PatternTagger.ae2patterntagger.items.components.PatternProviderTag;
 import org.ae2PatternTagger.ae2patterntagger.network.AdvancedPatternAccessTerminalPacket;
 import org.ae2PatternTagger.ae2patterntagger.network.ClearAdvancedPatternAccessTerminalPacket;
@@ -256,7 +257,44 @@ public class AdvancedPatternAccessTerminalMenu extends AEBaseMenu implements Lin
                 }
 
             } else {
-                AELog.warn("Client refers to invalid slot %d of inventory %s", new Object[]{slot, inv.container});
+                AELog.warn("Client refers to invalid playerInventorySlot %d of inventory %s", new Object[]{slot, inv.container});
+            }
+        }
+    }
+
+    public void quickMoveToPatternContainer(ServerPlayer player, QuickMoveAction action, int playerInventorySlot, long containerId) {
+        ContainerTracker inv = (ContainerTracker)this.byId.get(containerId);
+        if(inv != null){
+            if (playerInventorySlot >= 0 && playerInventorySlot <= player.getInventory().getContainerSize()){
+                ItemStack carried = player.getInventory().getItem(playerInventorySlot);
+                if (carried.isEmpty()) {
+                    return;
+                }
+                switch (action) {
+                    case SINGLE:
+                        // check every slot in the container
+                        for (int i = 0; i < inv.server.size(); i++) {
+                            ItemStack stackInSlot = inv.server.getStackInSlot(i);
+                            if (stackInSlot.isEmpty() || ItemStack.isSameItemSameComponents(stackInSlot, carried)) {
+                                // if the slot is empty or the item in the slot is the same as the carried item, insert it
+                                ItemStack remaining = inv.server.insertItem(i, carried, false);
+                                if (remaining.isEmpty()) {
+                                    player.getInventory().setItem(playerInventorySlot, ItemStack.EMPTY);
+                                    break;
+                                } else {
+                                    player.getInventory().setItem(playerInventorySlot, remaining);
+                                    if (ItemStack.isSameItemSameComponents(stackInSlot, carried)){
+                                        // do this in case the pattern max stack is over 1 somehow
+                                        continue;
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                }
+            } else {
+                AELog.warn("Client refers to invalid playerInventorySlot %d of inventory %s", new Object[]{playerInventorySlot, inv.container});
             }
         }
     }
