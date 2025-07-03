@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "org.ae2LabeledPatterns.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "ae2labeledpatterns.refmap.json",
+  "mixins": [
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

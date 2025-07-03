@@ -1,0 +1,23 @@
+{
+  "block.ae2labeledpatterns.my_block": "我的方块",
+  "creativetab.ae2labeledpatterns.main": "AE2标签工具",
+  "gui.ae2labeledpatterns.labeledterminalcycletagbuttonemptyfocus": "无关注标签",
+  "gui.ae2labeledpatterns.labeledterminalcycletagbuttonfocusing": "当前: %s, 颜色: %s",
+  "gui.ae2labeledpatterns.labeledterminalcycletagbuttonmessage": "标签过滤",
+  "gui.ae2labeledpatterns.labelereditconfirm": "确认",
+  "gui.ae2labeledpatterns.labelereditlock": "输入锁定",
+  "gui.ae2labeledpatterns.labelereditlockhint": "锁定输入框不允许编辑",
+  "gui.ae2labeledpatterns.labelereditsave": "保存",
+  "gui.ae2labeledpatterns.labelerinputplaceholder": "请输入标签名称",
+  "gui.ae2labeledpatterns.labelertitle": "标签工具",
+  "gui.ae2labeledpatterns.labellistdelete": "删除",
+  "gui.ae2labeledpatterns.labellistselect": "选择",
+  "gui.ae2labeledpatterns.labellisttitle": "保存的标签",
+  "gui.ae2labeledpatterns.moveconveniencebuttonforall": "将相同的样板插入到的每一个样板供应器中",
+  "gui.ae2labeledpatterns.moveconveniencebuttonforallstrict": "严格地将相同的样板插入到的每一个样板供应器中。",
+  "gui.ae2labeledpatterns.moveconveniencebuttonnone": "无",
+  "gui.ae2labeledpatterns.moveconveniencebuttontitle": "快速移动方式",
+  "item.ae2labeledpatterns.labeler": "标签工具",
+  "item.ae2labeledpatterns.my_item": "我的物品",
+  "waila.ae2labeledpatterns.patternproviderlabel": "标签: %s，颜色: %s"
+}
