@@ -3,6 +3,9 @@ package org.ae2LabeledPatterns.items;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import org.ae2LabeledPatterns.items.components.ComponentRegisters;
+import org.ae2LabeledPatterns.items.components.LabelerSetting;
+import org.ae2LabeledPatterns.items.components.MultiBlockPos;
 
 import static org.ae2LabeledPatterns.Ae2LabeledPatterns.MODID;
 
@@ -17,5 +20,8 @@ public class ItemRegisters {
             LABELER_ID,
             LabelerItem::new,
 //            new Item.Properties().component(ComponentRegisters.PATTERN_PROVIDER_LABEL, new PatternProviderLabel("sample"))
-            new Item.Properties());
+            new Item.Properties()
+//                    .component(ComponentRegisters.LABELER_SETTING.value(), new LabelerSetting())
+//                    .component(ComponentRegisters.MULTI_BLOCK_POS.value(), new MultiBlockPos())
+    );
 }

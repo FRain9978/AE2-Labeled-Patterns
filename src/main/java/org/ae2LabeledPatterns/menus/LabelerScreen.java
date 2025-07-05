@@ -20,7 +20,7 @@ public class LabelerScreen extends AEBaseScreen<LabelerMenu> {
 
     private final AETextField inputField;
     private final ToggleButton lockButton;
-    private final IconButton confirmButton;
+//    private final IconButton confirmButton;
     private final IconButton saveButton;
 
     public LabelerScreen(LabelerMenu menu, Inventory playerInventory, Component title, ScreenStyle style) {
@@ -33,16 +33,16 @@ public class LabelerScreen extends AEBaseScreen<LabelerMenu> {
         }
 
         lockButton = new ToggleButton(Icon.LOCKED, Icon.UNLOCKED, GUIText.LabelerEditLock.text(), GUIText.LabelerEditLockHint.text(),
-                (isLocked) -> this.menu.setSetting(new LabelerSetting(isLocked? YesNo.YES : YesNo.NO)));
+                (isLocked) -> this.menu.setSetting(new LabelerSetting(isLocked? YesNo.YES : YesNo.NO, this.menu.setting.mode())));
         this.addToLeftToolbar(lockButton);
 
-        confirmButton = new MActionButton(Icon.VIEW_MODE_CRAFTING, (button) -> {
-            if (this.menu.setting.isLockEdit() == YesNo.YES) return;
-            var text = this.inputField.getValue();
-            if (!text.isBlank()) {
-                this.menu.setCurrentLabel(new PatternProviderLabel(text));
-            }
-        }, GUIText.LabelerEditConfirm.text());
+//        confirmButton = new MActionButton(Icon.VIEW_MODE_CRAFTING, (button) -> {
+//            if (this.menu.setting.isLockEdit() == YesNo.YES) return;
+//            var text = this.inputField.getValue();
+//            if (!text.isBlank()) {
+//                this.menu.setCurrentLabel(new PatternProviderLabel(text));
+//            }
+//        }, GUIText.LabelerEditConfirm.text());
 
         saveButton = new MActionButton(Icon.VIEW_MODE_ALL, (button) -> {
             var text = this.inputField.getValue();
@@ -51,11 +51,13 @@ public class LabelerScreen extends AEBaseScreen<LabelerMenu> {
             }
         }, GUIText.LabelerEditSave.text());
 
-        widgets.add("confirm", confirmButton);
+//        widgets.add("confirm", confirmButton);
+
         var host = this.menu.getHost();
         if (host instanceof ISubMenuHost){
             addToLeftToolbar(LabelListButton.create(this, (ISubMenuHost) host , Component.literal("Open Tag List")));
-            addToLeftToolbar(saveButton);
+//            addToLeftToolbar(saveButton);
+            widgets.add("save", saveButton);
         }
     }
 
@@ -74,7 +76,7 @@ public class LabelerScreen extends AEBaseScreen<LabelerMenu> {
         if(isLocked){
             inputField.setFocused(false);
         }
-        confirmButton.active = !isLocked;
+//        confirmButton.active = !isLocked;
     }
 
     @Override

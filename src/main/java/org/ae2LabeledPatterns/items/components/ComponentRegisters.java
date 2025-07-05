@@ -40,4 +40,12 @@ public class ComponentRegisters {
                             .networkSynchronized(LabelerSetting.STREAM_CODEC)
                             .cacheEncoding()
             );
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<MultiBlockPos>> MULTI_BLOCK_POS =
+            COMPONENTS.registerComponentType(
+                    "multi_block_pos",
+                    builder -> builder
+                            .persistent(MultiBlockPos.CODEC)
+                            .networkSynchronized(MultiBlockPos.STREAM_CODEC)
+                            .cacheEncoding()
+            );
 }

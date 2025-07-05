@@ -1,12 +1,19 @@
 package org.ae2LabeledPatterns;
 
 import appeng.api.ids.AECreativeTabIds;
+import appeng.core.network.ServerboundPacket;
+import appeng.core.network.serverbound.MouseWheelPacket;
+import appeng.helpers.IMouseWheelItem;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
@@ -23,20 +30,28 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.client.event.InputEvent;
+import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.ae2LabeledPatterns.blocks.BlockRegisters;
 import org.ae2LabeledPatterns.blocks.attachments.AttachmentRegisters;
+import org.ae2LabeledPatterns.items.IMMouseWheelItem;
 import org.ae2LabeledPatterns.items.ItemRegisters;
 import org.ae2LabeledPatterns.items.components.ComponentRegisters;
 import org.ae2LabeledPatterns.menus.InitScreens;
 import org.ae2LabeledPatterns.menus.MenuRegisters;
 import org.ae2LabeledPatterns.network.InitNetwork;
+import org.ae2LabeledPatterns.network.MMouseWheelPacket;
 import org.ae2LabeledPatterns.parts.PartRegisters;
 import org.slf4j.Logger;
 
@@ -62,7 +77,7 @@ public class Ae2LabeledPatterns {
     // Creates a creative tab with the id "ae2patterntagger:example_tab" for the example item, that is placed after the combat tab
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> CREATIVE_TAB = CREATIVE_MODE_TABS.register("ae2_pattern_tagger", () ->
             CreativeModeTab.builder()
-                    .title(Component.translatable("creativetab.ae2patterntagger.main"))
+                    .title(Component.translatable("creativetab.ae2labeledpatterns.main"))
                     .withTabsBefore(AECreativeTabIds.MAIN).icon(() -> ItemRegisters.LABELER.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
                         output.accept(ItemRegisters.LABELER.get());
@@ -74,7 +89,7 @@ public class Ae2LabeledPatterns {
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
     public Ae2LabeledPatterns(IEventBus modEventBus, ModContainer modContainer) {
         // Register the commonSetup method for modloading
-        modEventBus.addListener(this::commonSetup);
+//        modEventBus.addListener(this::commonSetup);
 
         ComponentRegisters.COMPONENTS.register(modEventBus);
         AttachmentRegisters.ATTACHMENTS.register(modEventBus);
@@ -93,8 +108,8 @@ public class Ae2LabeledPatterns {
         modEventBus.addListener(InitNetwork::init);
 
         modEventBus.addListener(InitCapabilities::register);
-        modEventBus.addListener(InitScreens::register);
-        modEventBus.addListener(PartRegisters::registerModels);
+//        modEventBus.addListener(InitScreens::register);
+//        modEventBus.addListener(PartRegisters::registerModels);
         PartRegisters.PARTS.register(modEventBus);
 
         // Register the Deferred Register to the mod event bus so tabs get registered
@@ -112,16 +127,16 @@ public class Ae2LabeledPatterns {
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
-    private void commonSetup(final FMLCommonSetupEvent event) {
-        // Some common setup code
-        LOGGER.info("HELLO FROM COMMON SETUP");
-
-        if (Config.logDirtBlock) LOGGER.info("DIRT BLOCK >> {}", BuiltInRegistries.BLOCK.getKey(Blocks.DIRT));
-
-        LOGGER.info(Config.magicNumberIntroduction + Config.magicNumber);
-
-        Config.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
-    }
+//    private void commonSetup(final FMLCommonSetupEvent event) {
+//        // Some common setup code
+//        LOGGER.info("HELLO FROM COMMON SETUP");
+//
+//        if (Config.logDirtBlock) LOGGER.info("DIRT BLOCK >> {}", BuiltInRegistries.BLOCK.getKey(Blocks.DIRT));
+//
+//        LOGGER.info(Config.magicNumberIntroduction + Config.magicNumber);
+//
+//        Config.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
+//    }
 
     public static ResourceLocation makeId(String id) {
         return ResourceLocation.fromNamespaceAndPath(MODID, id);
@@ -142,11 +157,71 @@ public class Ae2LabeledPatterns {
     // You can use EventBusSubscriber to automatically registerModels all static methods in the class annotated with @SubscribeEvent
     @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents {
+        public static final String KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_1_DESCRIPTION = "key." + Ae2LabeledPatterns.MODID + ".mouse_wheel_item_modifier_1.description";
+        public static final String KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_2_DESCRIPTION = "key." + Ae2LabeledPatterns.MODID + ".mouse_wheel_item_modifier_2.description";
+        public static final String KEYBINDING_MOD_CATEGORY = "key." + Ae2LabeledPatterns.MODID + ".category";
+
+        private static final KeyMapping MOUSE_WHEEL_ITEM_MODIFIER_1 = new KeyMapping(
+                KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_1_DESCRIPTION, KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM,
+                InputConstants.KEY_LSHIFT, KEYBINDING_MOD_CATEGORY);
+
+        private static final KeyMapping MOUSE_WHEEL_ITEM_MODIFIER_2 = new KeyMapping(
+                KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_2_DESCRIPTION, KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM,
+                InputConstants.KEY_LALT, KEYBINDING_MOD_CATEGORY);
+
+//        @SubscribeEvent
+//        public static void onClientSetup(FMLClientSetupEvent event) {
+//            // Some client setup code
+//            LOGGER.info("HELLO FROM CLIENT SETUP");
+//            LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+//        }
+
         @SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event) {
-            // Some client setup code
-            LOGGER.info("HELLO FROM CLIENT SETUP");
-            LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+        public static void registerScreen(RegisterMenuScreensEvent event){
+            InitScreens.register(event);
+        }
+
+        @SubscribeEvent
+        public static void registerModels(ModelEvent.RegisterAdditional event){
+            PartRegisters.registerModels(event);
+        }
+
+        @SubscribeEvent
+        public static void registerKeyBinding(RegisterKeyMappingsEvent event) {
+            // Register the key mappings for mouse wheel item modifiers
+            event.register(MOUSE_WHEEL_ITEM_MODIFIER_1);
+            event.register(MOUSE_WHEEL_ITEM_MODIFIER_2);
+        }
+    }
+
+    @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+    public static class ClientGameEvents{
+        @SubscribeEvent
+        public static void registerMouseEvent(final InputEvent.MouseScrollingEvent event) {
+            if (event.getScrollDeltaY() == 0) {
+                return;
+            }
+
+            final Minecraft mc = Minecraft.getInstance();
+            final Player player = mc.player;
+
+            int downIndex = 0;
+            if (ClientModEvents.MOUSE_WHEEL_ITEM_MODIFIER_1.isDown()) {
+                downIndex = 1;
+            } else if (ClientModEvents.MOUSE_WHEEL_ITEM_MODIFIER_2.isDown()) {
+                downIndex = 2;
+            }
+            if (downIndex != 0){
+                var mainHand = player.getItemInHand(InteractionHand.MAIN_HAND)
+                        .getItem() instanceof IMMouseWheelItem;
+                var offHand = player.getItemInHand(InteractionHand.OFF_HAND).getItem() instanceof IMouseWheelItem;
+
+                if (mainHand || offHand) {
+                    ServerboundPacket message = new MMouseWheelPacket(event.getScrollDeltaY() > 0, downIndex);
+                    PacketDistributor.sendToServer(message);
+                    event.setCanceled(true);
+                }
+            }
         }
     }
 }

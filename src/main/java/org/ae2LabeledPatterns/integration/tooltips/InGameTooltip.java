@@ -8,6 +8,20 @@ import org.jetbrains.annotations.NotNull;
 
 public enum InGameTooltip implements LocalizationEnum {
     PatternProviderLabel("Label: %s, Color: %s","标签: %s，颜色: %s"),
+
+    CycleLabelerMode("Current Mode: %s", "当前模式: %s"),
+    LabelerModeSingleSet("Set(Single)", "应用(单个)"),
+    LabelerModeSingleClear("Clear(Single)", "清除(单个)"),
+    LabelerModeAreaSet("Set(Area)", "应用(区域)"),
+    LabelerModeAreaClear("Clear(Area)", "清除(区域)"),
+    CycleLabelerLabel("Current Label: %s", "当前标签: %s"),
+
+    LabelerSelectedAreaTooBig("The area is too big, maximum is %d block space.", "范围太大，最大为%d方块空间"),
+    LabelerSelectFirstPoint("First point selected", "第一个点已选择"),
+    LabelerSetProviderLabel("Set label to %s", "标签设置为 %s"),
+    LabelerAreaSetProviderLabel("Set Area label to %s", "区域标签设置为 %s"),
+    LabelerClearProviderLabel("Label cleared", "标签已清除"),
+    LabelerAreaClearProviderLabel("Area label cleared", "区域标签已清除"),
     ;
     private final String root = "waila." + Ae2LabeledPatterns.MODID;
 

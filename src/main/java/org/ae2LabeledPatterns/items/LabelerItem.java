@@ -12,6 +12,8 @@ import appeng.menu.ISubMenu;
 import appeng.menu.MenuOpener;
 import appeng.menu.locator.ItemMenuHostLocator;
 import appeng.menu.locator.MenuLocators;
+import appeng.util.EnumCycler;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.server.level.ServerPlayer;
@@ -28,20 +30,29 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 import org.ae2LabeledPatterns.MSettings;
 import org.ae2LabeledPatterns.blocks.attachments.AttachmentRegisters;
-import org.ae2LabeledPatterns.items.components.ComponentRegisters;
-import org.ae2LabeledPatterns.items.components.PatternProviderLabel;
+import org.ae2LabeledPatterns.integration.tooltips.InGameTooltip;
+import org.ae2LabeledPatterns.items.components.*;
+import org.ae2LabeledPatterns.menus.GUIText;
 import org.ae2LabeledPatterns.menus.LabelerMenu;
 import org.ae2LabeledPatterns.network.SaveLabelAttachmentPacket;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Set;
 
-public class LabelerItem extends Item implements IMenuItem, IConfigurableObject {
+import static org.ae2LabeledPatterns.items.components.ComponentRegisters.*;
+
+public class LabelerItem extends Item implements IMenuItem, IConfigurableObject, IMMouseWheelItem {
+    private final int maxEntityCountInMultiSetMode = 64; // Maximum number of entities that can be set in multi-set mode
+
     private final IConfigManager configManager;
 
     public LabelerItem(Properties properties) {
-        super(properties);
+        super(properties
+                .component(ComponentRegisters.LABELER_SETTING.value(), new LabelerSetting())
+                .component(ComponentRegisters.MULTI_BLOCK_POS.value(), new MultiBlockPos())
+        );
         this.configManager = IConfigManager.builder(this::onConfigChanged)
                 .registerSetting(MSettings.LABELER_INPUT_LOCKED, YesNo.NO)
                 .build();
@@ -76,36 +87,149 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject 
         BlockEntity blockEntity = level.getBlockEntity(context.getClickedPos());
         Player player = context.getPlayer();
         if (player == null) return InteractionResult.PASS;
-        if (blockEntity instanceof PatternProviderLogicHost){
-            if (blockEntity.hasData(AttachmentRegisters.PATTERN_PROVIDER_LABEL)){
-                player.sendSystemMessage(Component.literal("-----------------"));
-                player.sendSystemMessage(Component.literal("Client: " + level.isClientSide));
-                player.sendSystemMessage(Component.literal("Content: "+ blockEntity.getData(AttachmentRegisters.PATTERN_PROVIDER_LABEL).name()));
-                player.sendSystemMessage(Component.literal("Color: "+ blockEntity.getData(AttachmentRegisters.PATTERN_PROVIDER_LABEL).color().toString()));
-                player.sendSystemMessage(Component.literal("-----------------"));
-            }
-            if (level.isClientSide){
-                return InteractionResult.sidedSuccess(true);
-            }
-            ServerPlayer serverPlayer = (ServerPlayer) player;
-            if (player.isCrouching()){
-                ItemStack itemStack = context.getItemInHand();
-                if (itemStack.getItem() instanceof LabelerItem){
-                    var hasLabel = itemStack.has(ComponentRegisters.PATTERN_PROVIDER_LABEL.get());
-                    if (hasLabel){
-                        var label = itemStack.getComponents().get(ComponentRegisters.PATTERN_PROVIDER_LABEL.get());
-                        var data = blockEntity.getData(AttachmentRegisters.PATTERN_PROVIDER_LABEL);
-                        if (label != null && !label.equals(data)) {
-                            blockEntity.setData(AttachmentRegisters.PATTERN_PROVIDER_LABEL, label);
-                            serverPlayer.connection.send(
-                                    new SaveLabelAttachmentPacket(label, blockEntity.getBlockPos()));
+        ItemStack itemStack = context.getItemInHand();
+        if (itemStack.getItem() instanceof LabelerItem){
+            var setting = itemStack.get(LABELER_SETTING.get());
+            switch (setting.mode()){
+                case LabelerMode.SINGLE_SET:{
+                    if (blockEntity instanceof PatternProviderLogicHost){
+                        if (level.isClientSide){
+                            return InteractionResult.sidedSuccess(true);
                         }
+                        ServerPlayer serverPlayer = (ServerPlayer) player;
+                        if (player.isCrouching()){
+                            var hasLabel = itemStack.has(ComponentRegisters.PATTERN_PROVIDER_LABEL.get());
+                            if (hasLabel){
+                                var label = itemStack.getComponents().get(ComponentRegisters.PATTERN_PROVIDER_LABEL.get());
+                                setProviderLabel(serverPlayer, blockEntity, label, true);
+                            }
+                            return InteractionResult.sidedSuccess(false);
+                        }
+                    }
+                }
+                case LabelerMode.SINGLE_CLEAR:{
+                    if (blockEntity instanceof PatternProviderLogicHost) {
+                        if (level.isClientSide) {
+                            return InteractionResult.sidedSuccess(true);
+                        }
+                        ServerPlayer serverPlayer = (ServerPlayer) player;
+                        if (player.isCrouching()) {
+                            clearProviderLabel(serverPlayer, blockEntity, true);
+                            return InteractionResult.sidedSuccess(false);
+                        }
+                    }
+                    break;
+                }
+                case LabelerMode.AREA_SET:{
+                    if (level.isClientSide) {
+                        return InteractionResult.sidedSuccess(true);
+                    }
+                    var currentPosData = itemStack.get(ComponentRegisters.MULTI_BLOCK_POS.get());
+                    if (currentPosData == null) {return InteractionResult.sidedSuccess(false);}
+                    currentPosData.addPos(context.getClickedPos());
+                    if (currentPosData.isFull()){
+                        // check if entity size between points are valid
+                        var p1 = currentPosData.p1();
+                        var p2 = currentPosData.p2();
+                        if (p1 == null || p2 == null) {return InteractionResult.sidedSuccess(false);}
+                        if (getAreaEntityCount(p1, p2) > maxEntityCountInMultiSetMode){
+                            itemStack.set(ComponentRegisters.MULTI_BLOCK_POS.get(), currentPosData.clear());
+                            player.sendSystemMessage(InGameTooltip.LabelerSelectedAreaTooBig.text(maxEntityCountInMultiSetMode));
+                            return InteractionResult.sidedSuccess(false);
+                        }
+                        ServerPlayer serverPlayer = (ServerPlayer) player;
+                        var label = itemStack.getComponents().get(ComponentRegisters.PATTERN_PROVIDER_LABEL.get());
+                        // get all the blockEntity between the points
+                        for (int x = Math.min(p1.getX(), p2.getX()); x <= Math.max(p1.getX(), p2.getX()); x++) {
+                            for (int y = Math.min(p1.getY(), p2.getY()); y <= Math.max(p1.getY(), p2.getY()); y++) {
+                                for (int z = Math.min(p1.getZ(), p2.getZ()); z <= Math.max(p1.getZ(), p2.getZ()); z++) {
+                                    BlockEntity be = level.getBlockEntity(new BlockPos(x, y, z));
+                                    if (be instanceof PatternProviderLogicHost) {
+                                        setProviderLabel(serverPlayer, be, label, false);
+                                    }
+                                }
+                            }
+                        }
+                        // clear the currentPosData
+                        itemStack.set(ComponentRegisters.MULTI_BLOCK_POS.get(), currentPosData.clear());
+                        if (label != null) {
+                            player.sendSystemMessage(InGameTooltip.LabelerAreaSetProviderLabel.text(label.name()));
+                        }
+                    }else{
+                        itemStack.set(ComponentRegisters.MULTI_BLOCK_POS.get(), currentPosData);
+                        player.sendSystemMessage(InGameTooltip.LabelerSelectFirstPoint.text());
+                    }
+                    return InteractionResult.sidedSuccess(false);
+                }
+                case LabelerMode.AREA_CLEAR:{
+                    if (level.isClientSide) {
+                        return InteractionResult.sidedSuccess(true);
+                    }
+                    var currentPosData = itemStack.get(ComponentRegisters.MULTI_BLOCK_POS.get());
+                    if (currentPosData == null) {return InteractionResult.sidedSuccess(false);}
+                    currentPosData.addPos(context.getClickedPos());
+                    if (currentPosData.isFull()) {
+                        // clear all the blockEntity between the points
+                        var p1 = currentPosData.p1();
+                        var p2 = currentPosData.p2();
+                        if (p1 == null || p2 == null) {return InteractionResult.sidedSuccess(false);}
+                        if (getAreaEntityCount(p1, p2) > maxEntityCountInMultiSetMode){
+                            player.sendSystemMessage(InGameTooltip.LabelerSelectedAreaTooBig.text(maxEntityCountInMultiSetMode));
+                            return InteractionResult.sidedSuccess(false);
+                        }
+                        ServerPlayer serverPlayer = (ServerPlayer) player;
+                        for (int x = Math.min(p1.getX(), p2.getX()); x <= Math.max(p1.getX(), p2.getX()); x++) {
+                            for (int y = Math.min(p1.getY(), p2.getY()); y <= Math.max(p1.getY(), p2.getY()); y++) {
+                                for (int z = Math.min(p1.getZ(), p2.getZ()); z <= Math.max(p1.getZ(), p2.getZ()); z++) {
+                                    BlockEntity be = level.getBlockEntity(new BlockPos(x, y, z));
+                                    if (be instanceof PatternProviderLogicHost) {
+                                        clearProviderLabel(serverPlayer, be, false);
+                                    }
+                                }
+                            }
+                        }
+                        // clear the currentPosData
+                        itemStack.set(ComponentRegisters.MULTI_BLOCK_POS.get(), currentPosData.clear());
+                        player.sendSystemMessage(InGameTooltip.LabelerAreaClearProviderLabel.text());
+                    }else{
+                        itemStack.set(ComponentRegisters.MULTI_BLOCK_POS.get(), currentPosData);
+                        player.sendSystemMessage(InGameTooltip.LabelerSelectFirstPoint.text());
                     }
                     return InteractionResult.sidedSuccess(false);
                 }
             }
+
         }
+
         return super.useOn(context);
+    }
+
+    protected void setProviderLabel(ServerPlayer serverPlayer, BlockEntity blockEntity, PatternProviderLabel label, boolean showMessage) {
+        var data = blockEntity.getData(AttachmentRegisters.PATTERN_PROVIDER_LABEL);
+        if (label != null && !label.equals(data)) {
+            blockEntity.setData(AttachmentRegisters.PATTERN_PROVIDER_LABEL, label);
+            if (showMessage){
+                serverPlayer.sendSystemMessage(InGameTooltip.LabelerSetProviderLabel.text(label.name()));
+            }
+            serverPlayer.connection.send(
+                    new SaveLabelAttachmentPacket(label, blockEntity.getBlockPos()));
+        }
+    }
+
+    protected void clearProviderLabel(ServerPlayer serverPlayer, BlockEntity blockEntity, boolean showMessage) {
+        blockEntity.setData(AttachmentRegisters.PATTERN_PROVIDER_LABEL, PatternProviderLabel.Empty);
+        if (showMessage){
+            serverPlayer.sendSystemMessage(InGameTooltip.LabelerClearProviderLabel.text());
+        }
+        serverPlayer.connection.send(
+                new SaveLabelAttachmentPacket(new PatternProviderLabel(), blockEntity.getBlockPos()));
+    }
+
+    private int getAreaEntityCount(BlockPos p1, BlockPos p2) {
+        int distanceX = Math.abs(p1.getX() - p2.getX()) + 1;
+        int distanceY = Math.abs(p1.getY() - p2.getY()) + 1;
+        int distanceZ = Math.abs(p1.getZ() - p2.getZ()) + 1;
+        return distanceX * distanceY * distanceZ;
     }
 
     @Override
@@ -116,6 +240,32 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject 
     @Override
     public IConfigManager getConfigManager() {
         return configManager;
+    }
+
+    @Override
+    public void onWheel(ServerPlayer serverPlayer, ItemStack is, boolean up, int index) {
+        if (index == 1 && is.has(LABELER_SETTING.get())){
+            var setting = is.get(LABELER_SETTING.get());
+            if (setting != null) {
+                var currentValue = setting.mode();
+                var newValue = EnumCycler.rotateEnum(currentValue, up, Set.of(LabelerMode.values()));
+                is.set(LABELER_SETTING.get(), new LabelerSetting(setting.isLockEdit(), newValue));
+                is.update(MULTI_BLOCK_POS.get(), new MultiBlockPos(), MultiBlockPos::clear);
+                serverPlayer.displayClientMessage(InGameTooltip.CycleLabelerMode.text(newValue.text()), true);
+            }
+        } else if (index == 2 && is.has(SAVED_LABELS)) {
+            var savedLabels = is.get(SAVED_LABELS.get());
+            var currentLabel = is.get(PATTERN_PROVIDER_LABEL.get());
+            if (savedLabels != null && !savedLabels.isEmpty() && currentLabel != null &&!currentLabel.isEmpty()) {
+                var currentLabelIndex = savedLabels.indexOf(currentLabel);
+                if (currentLabelIndex == -1) return;
+                var nextIndex = up ? (currentLabelIndex + 1) % savedLabels.size() : (currentLabelIndex - 1 + savedLabels.size()) % savedLabels.size();
+                var nextLabel = savedLabels.get(nextIndex);
+                is.set(PATTERN_PROVIDER_LABEL.get(), nextLabel);
+                serverPlayer.displayClientMessage(InGameTooltip.CycleLabelerLabel.text(nextLabel.name()), true);
+            }
+        }
+
     }
 
     public class TaggerItemMenuHost extends ItemMenuHost<LabelerItem> implements ISubMenuHost{

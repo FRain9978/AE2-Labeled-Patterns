@@ -7,16 +7,19 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
-public record LabelerSetting(YesNo isLockEdit) {
+public record LabelerSetting(YesNo isLockEdit, LabelerMode mode) {
     public LabelerSetting(){
-        this(YesNo.NO);
+        this(YesNo.NO, LabelerMode.SINGLE_SET);
     }
 
     public static final Codec<LabelerSetting> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.xmap(
                     YesNo::valueOf,
                     YesNo::name
-            ).fieldOf("isLockEdit").forGetter(LabelerSetting::isLockEdit))
+            ).fieldOf("isLockEdit").forGetter(LabelerSetting::isLockEdit), Codec.STRING.xmap(
+                    LabelerMode::valueOf,
+                    LabelerMode::name
+                    ).fieldOf("mode").forGetter(LabelerSetting::mode))
             .apply(instance, LabelerSetting::new)
     );
 
@@ -24,5 +27,8 @@ public record LabelerSetting(YesNo isLockEdit) {
             ByteBufCodecs.STRING_UTF8.map(
                     YesNo::valueOf,
                     YesNo::name), LabelerSetting::isLockEdit,
+            ByteBufCodecs.STRING_UTF8.map(
+                    LabelerMode::valueOf,
+                    LabelerMode::name), LabelerSetting::mode,
             LabelerSetting::new);
 }

@@ -19,7 +19,10 @@ public class LanguageProviders {
 
         @Override
         protected void addTranslations() {
-            this.add("creativetab.ae2labeledpatterns.main", "AE2标签工具");
+            this.add("creativetab.ae2labeledpatterns.main", "AE2标签化样板");
+            this.add(Ae2LabeledPatterns.ClientModEvents.KEYBINDING_MOD_CATEGORY, "AE2标签化样板");
+            this.add(Ae2LabeledPatterns.ClientModEvents.KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_1_DESCRIPTION, "用鼠标滚轮物品的修饰键1");
+            this.add(Ae2LabeledPatterns.ClientModEvents.KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_2_DESCRIPTION, "用鼠标滚轮物品的修饰键2");
 
             for (var gui: GUIText.values()){
                 this.add(gui.getTranslationKey(), gui.getChineseText());
@@ -44,6 +47,9 @@ public class LanguageProviders {
         @Override
         protected void addTranslations() {
             this.add("creativetab.ae2labeledpatterns.main", "AE2 Labeled Patterns");
+            this.add(Ae2LabeledPatterns.ClientModEvents.KEYBINDING_MOD_CATEGORY, "AE2 Labeled Patterns");
+            this.add(Ae2LabeledPatterns.ClientModEvents.KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_1_DESCRIPTION, "Modifier 1 for Mouse-Wheel Items");
+            this.add(Ae2LabeledPatterns.ClientModEvents.KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_2_DESCRIPTION, "Modifier 2 for Mouse-Wheel Items");
 
             for (var gui: GUIText.values()){
                 this.add(gui.getTranslationKey(), gui.getEnglishText());

@@ -1,6 +1,6 @@
 {
   "block.ae2labeledpatterns.my_block": "我的方块",
-  "creativetab.ae2labeledpatterns.main": "AE2标签工具",
+  "creativetab.ae2labeledpatterns.main": "AE2标签化样板",
   "gui.ae2labeledpatterns.labeledterminalcycletagbuttonemptyfocus": "无关注标签",
   "gui.ae2labeledpatterns.labeledterminalcycletagbuttonfocusing": "当前: %s, 颜色: %s",
   "gui.ae2labeledpatterns.labeledterminalcycletagbuttonmessage": "标签过滤",
@@ -19,5 +19,20 @@
   "gui.ae2labeledpatterns.moveconveniencebuttontitle": "快速移动方式",
   "item.ae2labeledpatterns.labeler": "标签工具",
   "item.ae2labeledpatterns.my_item": "我的物品",
+  "key.ae2labeledpatterns.category": "AE2标签化样板",
+  "key.ae2labeledpatterns.mouse_wheel_item_modifier_1.description": "用鼠标滚轮物品的修饰键1",
+  "key.ae2labeledpatterns.mouse_wheel_item_modifier_2.description": "用鼠标滚轮物品的修饰键2",
+  "waila.ae2labeledpatterns.cyclelabelerlabel": "当前标签: %s",
+  "waila.ae2labeledpatterns.cyclelabelermode": "当前模式: %s",
+  "waila.ae2labeledpatterns.labelerareaclearproviderlabel": "区域标签已清除",
+  "waila.ae2labeledpatterns.labelerareasetproviderlabel": "区域标签设置为 %s",
+  "waila.ae2labeledpatterns.labelerclearproviderlabel": "标签已清除",
+  "waila.ae2labeledpatterns.labelermodeareaclear": "清除(区域)",
+  "waila.ae2labeledpatterns.labelermodeareaset": "应用(区域)",
+  "waila.ae2labeledpatterns.labelermodesingleclear": "清除(单个)",
+  "waila.ae2labeledpatterns.labelermodesingleset": "应用(单个)",
+  "waila.ae2labeledpatterns.labelerselectedareatoobig": "范围太大，最大为%d方块空间",
+  "waila.ae2labeledpatterns.labelerselectfirstpoint": "第一个点已选择",
+  "waila.ae2labeledpatterns.labelersetproviderlabel": "标签设置为 %s",
   "waila.ae2labeledpatterns.patternproviderlabel": "标签: %s，颜色: %s"
 }

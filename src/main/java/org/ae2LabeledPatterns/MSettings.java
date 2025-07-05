@@ -3,6 +3,7 @@ package org.ae2LabeledPatterns;
 import appeng.api.config.Setting;
 import appeng.api.config.Settings;
 import appeng.api.config.YesNo;
+import org.ae2LabeledPatterns.items.components.LabelerMode;
 import org.ae2LabeledPatterns.menus.MoveConvenience;
 
 import java.lang.reflect.Method;
@@ -41,7 +42,7 @@ public class MSettings {
         }
     }
 
-    public static Setting<YesNo> LABELER_INPUT_LOCKED = RegiterSetting("labeler_locked", YesNo.YES, YesNo.NO);
+    public static Setting<YesNo> LABELER_INPUT_LOCKED = RegiterSetting("labeler_input_locked", YesNo.YES, YesNo.NO);
     public static Setting<MoveConvenience> TERMINAL_MOVE_CONVENIENCE = RegiterSetting("terminal_move_convenience",
             MoveConvenience.class);
 }

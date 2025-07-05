@@ -20,6 +20,7 @@ public class InitNetwork {
         clientbound(registrar, SaveLabelAttachmentPacket.TYPE, SaveLabelAttachmentPacket.STREAM_CODEC);
 
         serverbound(registrar, InventoryQuickMovePacket.TYPE, InventoryQuickMovePacket.STREAM_CODEC);
+        serverbound(registrar, MMouseWheelPacket.TYPE, MMouseWheelPacket.STREAM_CODEC);
 
         // Serverbound
 //        serverbound(registrar, ColorApplicatorSelectColorPacket.TYPE, ColorApplicatorSelectColorPacket.STREAM_CODEC);
