@@ -2,6 +2,7 @@ package org.ae2LabeledPatterns.parts;
 
 import appeng.api.config.Settings;
 import appeng.api.config.ShowPatternProviders;
+import appeng.api.config.YesNo;
 import appeng.api.parts.IPartItem;
 import appeng.api.parts.IPartModel;
 import appeng.api.storage.ILinkStatus;
@@ -40,6 +41,7 @@ public class LabeledPatternAccessTerminalPart extends AbstractDisplayPart implem
         this.configManager = IConfigManager.builder(() -> this.getHost().markForSave())
                 .registerSetting(Settings.TERMINAL_SHOW_PATTERN_PROVIDERS, ShowPatternProviders.VISIBLE)
                 .registerSetting(MSettings.TERMINAL_MOVE_CONVENIENCE, MoveConvenience.NONE)
+                .registerSetting(MSettings.TERMINAL_SHOW_GROUP_SELECT_RATIO, YesNo.NO)
                 .build();
     }
 

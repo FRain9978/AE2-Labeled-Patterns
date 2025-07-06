@@ -1,6 +1,7 @@
 package org.ae2LabeledPatterns.menus.widgets;
 
 import appeng.api.config.Setting;
+import appeng.api.config.YesNo;
 import appeng.client.gui.Icon;
 import appeng.client.gui.widgets.ServerSettingToggleButton;
 import appeng.client.gui.widgets.SettingToggleButton;
@@ -18,17 +19,7 @@ import java.util.Collections;
 import java.util.Map;
 
 public class MServerSettingToggleButton<T extends Enum<T>> extends ServerSettingToggleButton<T> {
-//    private static final Method registerAppMethod;
-//    static{
-//        try {
-//            registerAppMethod = SettingToggleButton.class.getDeclaredMethod("registerApp",
-//                    Icon.class, Setting.class, Enum.class, ButtonToolTips.class, ButtonToolTips.class);
-//            registerAppMethod.setAccessible(true);
-//        } catch (Exception e) {
-//            throw new RuntimeException("Failed to access registerApp method in ServerSettingToggleButton", e);
-//        }
-//    }
-// 缓存反射结果
+    // 缓存反射结果
     private static Class<?> enumPairClass;
     private static Class<?> buttonAppearanceClass;
     private static Constructor<?> enumPairConstructor;
@@ -123,6 +114,21 @@ public class MServerSettingToggleButton<T extends Enum<T>> extends ServerSetting
                 MoveConvenience.ONCE_FOR_ALL_STRICT,
                 GUIText.MoveConvenienceButtonTitle.text(),
                 GUIText.MoveConvenienceButtonForAllStrict.text()
+        );
+
+        addAppearance(
+                Icon.FULLNESS_FULL,
+                MSettings.TERMINAL_SHOW_GROUP_SELECT_RATIO,
+                YesNo.YES,
+                GUIText.ShowGroupSelectRatioTitle.text(),
+                GUIText.ShowGroupSelectRatioYes.text()
+        );
+        addAppearance(
+                Icon.FULLNESS_EMPTY,
+                MSettings.TERMINAL_SHOW_GROUP_SELECT_RATIO,
+                YesNo.NO,
+                GUIText.ShowGroupSelectRatioTitle.text(),
+                GUIText.ShowGroupSelectRatioNo.text()
         );
     }
 }

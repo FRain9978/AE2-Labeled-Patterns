@@ -2,6 +2,7 @@ package org.ae2LabeledPatterns.menus;
 
 import appeng.api.config.Settings;
 import appeng.api.config.ShowPatternProviders;
+import appeng.api.config.YesNo;
 import appeng.api.crafting.PatternDetailsHelper;
 import appeng.api.implementations.blockentities.PatternContainerGroup;
 import appeng.api.inventories.InternalInventory;
@@ -29,6 +30,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.ae2LabeledPatterns.Ae2LabeledPatterns;
 import org.ae2LabeledPatterns.MSettings;
@@ -46,6 +48,8 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
     public ShowPatternProviders showPatternProviders;
     @GuiSync(2)
     public MoveConvenience moveConvenience;
+    @GuiSync(3)
+    public YesNo showGroupSelectRatio;
     private ILinkStatus linkStatus;
     public static final MenuType<LabeledPatternAccessTerminalMenu> TYPE = MenuTypeBuilder
             .create(LabeledPatternAccessTerminalMenu::new, ILabeledPatternAccessTermMenuHost.class)
@@ -56,7 +60,7 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
     private final Set<PatternContainer> pinnedHosts;
 
     private static final String ACTION_CYCLE_TAG = "cycleTag";
-    @GuiSync(3)
+    @GuiSync(4)
     public PatternProviderLabel currentTag = PatternProviderLabel.Empty;
 
     public HashSet<PatternProviderLabel> allTagTypes = new HashSet<>();
@@ -67,6 +71,9 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
     public MoveConvenience getMoveConvenience() {
         return this.moveConvenience;
     }
+    public YesNo getShowGroupSelectRatio() {
+        return this.showGroupSelectRatio;
+    }
 
     public LabeledPatternAccessTerminalMenu(int id, Inventory ip, ILabeledPatternAccessTermMenuHost anchor) {
         this(TYPE, id, ip, anchor, true);
@@ -76,6 +83,7 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
         super(menuType, id, ip, host);
         this.showPatternProviders = ShowPatternProviders.VISIBLE;
         this.moveConvenience = MoveConvenience.NONE;
+        this.showGroupSelectRatio = YesNo.NO;
         this.linkStatus = ILinkStatus.ofDisconnected();
         this.diList = new IdentityHashMap();
         this.byId = new Long2ObjectOpenHashMap();
@@ -93,6 +101,7 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
         if (!this.isClientSide()) {
             this.showPatternProviders = (ShowPatternProviders)this.host.getConfigManager().getSetting(Settings.TERMINAL_SHOW_PATTERN_PROVIDERS);
             this.moveConvenience = (MoveConvenience) this.host.getConfigManager().getSetting(MSettings.TERMINAL_MOVE_CONVENIENCE);
+            this.showGroupSelectRatio = (YesNo) this.host.getConfigManager().getSetting(MSettings.TERMINAL_SHOW_GROUP_SELECT_RATIO);
             this.currentTag = this.host.getCurrentTag();
             super.broadcastChanges();
             this.updateLinkStatus();
@@ -270,20 +279,35 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
         }
     }
 
-    public void quickMoveToPatternContainer(ServerPlayer player, int playerInventorySlot, long containerId) {
+    public void quickMoveToPatternContainer(ServerPlayer player, int playerInventorySlot, long containerId, PatternContainerGroup group) {
         if (playerInventorySlot >= 0 && playerInventorySlot <= player.getInventory().getContainerSize()){
             ItemStack carried = player.getInventory().getItem(playerInventorySlot);
             if (carried.isEmpty()) {
                 return;
             }
             switch (moveConvenience){
-                case NONE:
-                    // do nothing, handled by the client
-                    ContainerTracker inv = (ContainerTracker)this.byId.get(containerId);
-                    insertPatternToContainer(player, playerInventorySlot,inv.server, carried, false);
+                case NONE: {// do nothing, handled by the client
+                    Slot patternSlot = getSlot(playerInventorySlot);
+                    ContainerTracker inv = (ContainerTracker) this.byId.get(containerId);
+                    if (!inv.group.equals(group)){
+                        for(ContainerTracker container : this.byId.values()){
+                            if (container.group.equals(group)){
+                                if (insertPatternToContainer(patternSlot.getItem().copy(), container.server, false)) {
+                                    patternSlot.set(ItemStack.EMPTY);
+                                    return;
+                                }
+                            }
+                        }
+                    }else{
+                        if (insertPatternToContainer(patternSlot.getItem().copy(), inv.server, false)) {
+                            patternSlot.set(ItemStack.EMPTY);
+                            return;
+                        }
+                    }
                     return;
+                }
                 case ONCE_FOR_ALL: {
-                    if (currentTag.isEmpty()) return;
+//                    if (currentTag.isEmpty()) return;
                     // first check how many blank pattern in player's inventory
                     int blankPatternCount = 0;
                     Map<Integer, Integer> patternCount = new HashMap<>();
@@ -294,33 +318,32 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
                             patternCount.put(i, stack.getCount());
                         }
                     }
-                    int insertedCount = 0;
+                    int insertedCount = -1;
+                    Slot patternSlot = getSlot(playerInventorySlot);
+                    ItemStack itemStack = patternSlot.getItem();
                     // if there are blank patterns, insert the carried item to all container in byId map as many as possible
                     for (ContainerTracker container : this.byId.values()) {
-                        if (!container.server.isEmpty()) {
-                            if (insertPatternToContainer(player, playerInventorySlot, container.server, carried.copy(), false)) {
-                                insertedCount++;
-                                if (insertedCount >= blankPatternCount) {
-                                    break; // stop if we have inserted as many as we can
-                                }
+                        if (container.group.equals(group)  && insertPatternToContainer(itemStack.copy(), container.server, false)) {
+                            insertedCount++;
+                            if (insertedCount >= blankPatternCount) {
+                                break; // stop if we have inserted as many as we can
                             }
                         }
                     }
-                    if (insertedCount > 0) {
+                    if (insertedCount >= 0) {
                         // if inserted, remove the carried item from player's inventory
-                        player.getInventory().setItem(playerInventorySlot, ItemStack.EMPTY);
+//                        player.getInventory().setItem(playerInventorySlot, ItemStack.EMPTY);
+                        patternSlot.set(ItemStack.EMPTY);
                         // then update the blank pattern count in player's inventory
                         for (Map.Entry<Integer, Integer> entry : patternCount.entrySet()) {
                             int slot = entry.getKey();
                             int count = entry.getValue();
                             int newCount = count - insertedCount;
                             if (newCount <= 0) {
-                                player.getInventory().setItem(slot, ItemStack.EMPTY);
+                                getSlot(slot).set(ItemStack.EMPTY);
                                 insertedCount -= count;
                             } else {
-                                ItemStack newStack = player.getInventory().getItem(slot).copy();
-                                newStack.setCount(newCount);
-                                player.getInventory().setItem(slot, newStack);
+                                getSlot(slot).getItem().setCount(newCount);
                                 insertedCount = 0;
                             }
                             if (insertedCount <= 0) {
@@ -331,7 +354,7 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
                     return;
                 }
                 case ONCE_FOR_ALL_STRICT: {
-                    if (currentTag.isEmpty()) return;
+//                    if (currentTag.isEmpty()) return;
                     // first check how many blank pattern in player's inventory
                     int blankPatternCount = 0;
                     Map<Integer, Integer> patternCount = new HashMap<>();
@@ -342,39 +365,38 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
                             patternCount.put(i, stack.getCount());
                         }
                     }
-                    int insertedCount = 0;
+                    int insertedCount = -1;
+                    Slot patternSlot = getSlot(playerInventorySlot);
+                    ItemStack itemStack = patternSlot.getItem();
                     // if there are blank patterns, insert the carried item to all container in byId map as many as possible
+                    Set<ContainerTracker> containerTrackers = new HashSet<>();
                     for (ContainerTracker container : this.byId.values()) {
-                        if (!container.server.isEmpty()) {
-                            if (insertPatternToContainer(player, playerInventorySlot, container.server, carried.copy(), true)) {
-                                insertedCount++;
-                                if (insertedCount > blankPatternCount) {
-                                    // strict mode return directly
-                                    return;
-                                }
+                        if (container.group.equals(group) && insertPatternToContainer(itemStack.copy(), container.server, true)) {
+                            containerTrackers.add(container);
+                            insertedCount++;
+                            if (insertedCount > blankPatternCount) {
+                                // strict mode return directly
+                                return;
                             }
                         }
                     }
-                    for (ContainerTracker container : this.byId.values()) {
-                        if (!container.server.isEmpty()) {
-                            insertPatternToContainer(player, playerInventorySlot, container.server, carried.copy(), false);
-                        }
+                    for (ContainerTracker container : containerTrackers) {
+                        insertPatternToContainer(itemStack.copy(), container.server, false);
                     }
-                    if (insertedCount > 0) {
+                    if (insertedCount >= 0) {
                         // if inserted, remove the carried item from player's inventory
-                        player.getInventory().setItem(playerInventorySlot, ItemStack.EMPTY);
+                        patternSlot.set(ItemStack.EMPTY);
+//                        player.getInventory().setItem(playerInventorySlot, ItemStack.EMPTY);
                         // then update the blank pattern count in player's inventory
                         for (Map.Entry<Integer, Integer> entry : patternCount.entrySet()) {
                             int slot = entry.getKey();
                             int count = entry.getValue();
                             int newCount = count - insertedCount;
                             if (newCount <= 0) {
-                                player.getInventory().setItem(slot, ItemStack.EMPTY);
+                                getSlot(slot).set(ItemStack.EMPTY);
                                 insertedCount -= count;
                             } else {
-                                ItemStack newStack = player.getInventory().getItem(slot).copy();
-                                newStack.setCount(newCount);
-                                player.getInventory().setItem(slot, newStack);
+                                getSlot(slot).getItem().setCount(newCount);
                                 insertedCount = 0;
                             }
                             if (insertedCount <= 0) {
@@ -390,26 +412,14 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
         }
     }
 
-    private boolean insertPatternToContainer(ServerPlayer player, int playerInventorySlot, InternalInventory inventory, ItemStack carried, boolean simulate) {
-        for (int i = 0; i < inventory.size(); i++) {
-            ItemStack stackInSlot = inventory.getStackInSlot(i);
-            if (stackInSlot.isEmpty() || ItemStack.isSameItemSameComponents(stackInSlot, carried)) {
-                // if the slot is empty or the item in the slot is the same as the carried item, insert it
-                ItemStack remaining = inventory.insertItem(i, carried, simulate);
-                if (remaining.isEmpty()) {
-                    if (!simulate) player.getInventory().setItem(playerInventorySlot, ItemStack.EMPTY);
-                    return true;
-                } else {
-                    if (!simulate) player.getInventory().setItem(playerInventorySlot, remaining);
-                    if (ItemStack.isSameItemSameComponents(stackInSlot, carried)){
-                        // do this in case the pattern max stack is over 1 somehow
-                        continue;
-                    }
-                }
-                break;
-            }
+    private boolean insertPatternToContainer(ItemStack itemStack, InternalInventory inventory, boolean simulate) {
+        FilteredInternalInventory patternSlot = new FilteredInternalInventory(inventory, new PatternSlotFilter());
+        if (patternSlot.addItems(itemStack, simulate).isEmpty()){
+//            if (!simulate) sourceSlot.set(ItemStack.EMPTY);
+            return true;
+        }else{
+            return false;
         }
-        return false;
     }
 
     private void sendFullUpdate(@Nullable IGrid grid) {

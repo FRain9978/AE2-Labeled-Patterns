@@ -3,6 +3,7 @@ package org.ae2LabeledPatterns.menus;
 import appeng.api.config.Settings;
 import appeng.api.config.ShowPatternProviders;
 import appeng.api.config.TerminalStyle;
+import appeng.api.config.YesNo;
 import appeng.api.crafting.IPatternDetails;
 import appeng.api.crafting.PatternDetailsHelper;
 import appeng.api.implementations.blockentities.PatternContainerGroup;
@@ -14,10 +15,7 @@ import appeng.client.gui.me.patternaccess.PatternContainerRecord;
 import appeng.client.gui.me.patternaccess.PatternSlot;
 import appeng.client.gui.style.PaletteColor;
 import appeng.client.gui.style.ScreenStyle;
-import appeng.client.gui.widgets.AETextField;
-import appeng.client.gui.widgets.Scrollbar;
-import appeng.client.gui.widgets.ServerSettingToggleButton;
-import appeng.client.gui.widgets.SettingToggleButton;
+import appeng.client.gui.widgets.*;
 import appeng.core.AEConfig;
 import appeng.core.AppEng;
 import appeng.core.localization.GuiText;
@@ -50,6 +48,7 @@ import org.ae2LabeledPatterns.MSettings;
 import org.ae2LabeledPatterns.menus.widgets.MActionButton;
 import org.ae2LabeledPatterns.menus.widgets.MServerSettingToggleButton;
 import org.ae2LabeledPatterns.network.InventoryQuickMovePacket;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,17 +88,25 @@ public class LabeledPatternAccessTerminalScreen extends AEBaseScreen<LabeledPatt
     private final ServerSettingToggleButton<ShowPatternProviders> showPatternProviders;
     private final MActionButton cycleTagButton;
     private final ServerSettingToggleButton<MoveConvenience> moveConvenienceButton;
+    private final ServerSettingToggleButton<YesNo> showGroupSelectRatioButton;
 
     private int firstSlotsRowIndex = -1;
     private int lastSlotsRowIndex = -1;
+    private PatternContainerGroup firstShownGroup = null;
+    private PatternContainerGroup lastShownGroup = null;
+
+    private final HashMap<PatternContainerGroup, AECheckbox> checkboxMap = new HashMap<>();
+    private PatternContainerGroup currentGroup = null;
+
+    private boolean isShowGroupSelectRatio;
 
     public LabeledPatternAccessTerminalScreen(LabeledPatternAccessTerminalMenu menu, Inventory playerInventory, Component title, ScreenStyle style) {
         super(menu, playerInventory, title, style);
         this.scrollbar = this.widgets.addScrollBar("scrollbar", Scrollbar.BIG);
         this.imageWidth = GUI_WIDTH;
         TerminalStyle terminalStyle = AEConfig.instance().getTerminalStyle();
-        this.addToLeftToolbar(new SettingToggleButton(Settings.TERMINAL_STYLE, terminalStyle, this::toggleTerminalStyle));
-        this.showPatternProviders = new ServerSettingToggleButton(Settings.TERMINAL_SHOW_PATTERN_PROVIDERS, ShowPatternProviders.VISIBLE);
+        this.addToLeftToolbar(new SettingToggleButton<>(Settings.TERMINAL_STYLE, terminalStyle, this::toggleTerminalStyle));
+        this.showPatternProviders = new ServerSettingToggleButton<>(Settings.TERMINAL_SHOW_PATTERN_PROVIDERS, ShowPatternProviders.VISIBLE);
         this.addToLeftToolbar(this.showPatternProviders);
         this.searchField = this.widgets.addTextField("search");
         this.searchField.setResponder((str) -> this.refreshList());
@@ -113,6 +120,8 @@ public class LabeledPatternAccessTerminalScreen extends AEBaseScreen<LabeledPatt
         addToLeftToolbar(cycleTagButton);
         this.moveConvenienceButton = new MServerSettingToggleButton<>(MSettings.TERMINAL_MOVE_CONVENIENCE, MoveConvenience.NONE);
         this.addToLeftToolbar(this.moveConvenienceButton);
+        this.showGroupSelectRatioButton = new MServerSettingToggleButton<>(MSettings.TERMINAL_SHOW_GROUP_SELECT_RATIO, YesNo.NO);
+        this.addToLeftToolbar(this.showGroupSelectRatioButton);
 //        this.widgets.add("cycleTagButton", cycleTagButton);
     }
 
@@ -123,6 +132,15 @@ public class LabeledPatternAccessTerminalScreen extends AEBaseScreen<LabeledPatt
         super.init();
         this.setInitialFocus(this.searchField);
         this.resetScrollbar();
+        this.clearCheckboxes();
+    }
+
+    private void clearCheckboxes() {
+        for (var checkBox : checkboxMap.values()) {
+            removeWidget(checkBox);
+        }
+        checkboxMap.clear();
+        currentGroup = null;
     }
 
     public void drawFG(GuiGraphics guiGraphics, int offsetX, int offsetY, int mouseX, int mouseY) {
@@ -132,6 +150,9 @@ public class LabeledPatternAccessTerminalScreen extends AEBaseScreen<LabeledPatt
         int scrollLevel = this.scrollbar.getCurrentScroll();
         this.firstSlotsRowIndex = -1;
         this.lastSlotsRowIndex = -1;
+        this.firstShownGroup = null;
+        this.lastShownGroup = null;
+        Set<PatternContainerGroup> visibleGroups = new HashSet<>();
 
         for(int i = 0; i < this.visibleRows; ++i) {
             if (scrollLevel + i < this.rows.size()) {
@@ -164,11 +185,24 @@ public class LabeledPatternAccessTerminalScreen extends AEBaseScreen<LabeledPatt
                 } else if (row instanceof GroupHeaderRow) {
                     GroupHeaderRow headerRow = (GroupHeaderRow)row;
                     PatternContainerGroup group = headerRow.group;
+                    if (this.firstShownGroup == null) {
+                        this.firstShownGroup = group;
+                    }
+                    this.lastShownGroup = group;
+                    int offsetForCheckBox = isShowGroupSelectRatio? 14 : 0;
+                    if (isShowGroupSelectRatio){
+                        visibleGroups.add(group);
+                        renderCheckBox(
+                                group,
+                                offsetX + GUI_PADDING_X + PATTERN_PROVIDER_NAME_MARGIN_X - 2,
+                                offsetY + GUI_PADDING_Y + GUI_HEADER_HEIGHT + i * ROW_HEIGHT - 3);
+                    }
+
                     if (group.icon() != null) {
                         SimpleRenderContext renderContext = new SimpleRenderContext(LytRect.empty(), guiGraphics);
                         renderContext.renderItem(
                                 group.icon().getReadOnlyStack(),
-                                GUI_PADDING_X + PATTERN_PROVIDER_NAME_MARGIN_X,
+                                GUI_PADDING_X + PATTERN_PROVIDER_NAME_MARGIN_X + offsetForCheckBox,
                                 GUI_PADDING_Y + GUI_HEADER_HEIGHT + i * ROW_HEIGHT,
                                 8.0F,
                                 8.0F);
@@ -183,13 +217,60 @@ public class LabeledPatternAccessTerminalScreen extends AEBaseScreen<LabeledPatt
                     }
 
                     FormattedCharSequence text = Language.getInstance().getVisualOrder(this.font.substrByWidth(displayName, TEXT_MAX_WIDTH - 10));
-                    guiGraphics.drawString(font, text, GUI_PADDING_X + PATTERN_PROVIDER_NAME_MARGIN_X + 10,
+                    guiGraphics.drawString(font, text, GUI_PADDING_X + PATTERN_PROVIDER_NAME_MARGIN_X + offsetForCheckBox + 10,
                             GUI_PADDING_Y + GUI_HEADER_HEIGHT + i * ROW_HEIGHT, textColor, false);
                 }
             }
         }
+        if (isShowGroupSelectRatio){
+            // set check box visible depend on whether the group is visible
+            checkboxMap.entrySet().stream().filter( entry -> !visibleGroups.contains(entry.getKey()))
+                    .forEach(
+                            entry -> {
+                                var checkBox = entry.getValue();
+                                checkBox.visible = false;
+                            }
+                    );
+        }
 
         this.renderLinkStatus(guiGraphics, (this.getMenu()).getLinkStatus());
+    }
+
+    private void renderCheckBox(PatternContainerGroup group, int x, int y){
+        if (checkboxMap.containsKey(group)){
+            var checkBox = checkboxMap.get(group);
+            checkBox.setPosition(x, y);
+            checkBox.setSelected(currentGroup == group);
+            checkBox.visible = true;
+        } else {
+            var checkBox = getCheckBox(group, x, y);
+            checkboxMap.put(group, checkBox);
+//            this.checkboxes.push(checkBox);
+        }
+    }
+
+    private @NotNull AECheckbox getCheckBox(PatternContainerGroup group, int x, int y) {
+        var checkBox = new AECheckbox(
+                x,
+                y,
+                Minecraft.getInstance().font.width(group.name()) + 14,
+                AECheckbox.SIZE,
+                this.style,
+                Component.empty()
+                );
+        checkBox.setSelected(currentGroup == group);
+        checkBox.setChangeListener(
+                () -> {
+                    if (checkBox.isSelected()) {
+                        currentGroup = group;
+                    } else {
+                        currentGroup = null;
+                    }
+                }
+        );
+        checkBox.setRadio(true);
+        this.addRenderableWidget(checkBox);
+        return checkBox;
     }
 
     private void renderLinkStatus(GuiGraphics guiGraphics, ILinkStatus linkStatus) {
@@ -288,7 +369,8 @@ public class LabeledPatternAccessTerminalScreen extends AEBaseScreen<LabeledPatt
                                 if (clickType == ClickType.QUICK_MOVE) {
                                     InventoryQuickMovePacket p = new InventoryQuickMovePacket(
                                             slot.getSlotIndex(),
-                                            container.getServerId());
+                                            container.getServerId(),
+                                            currentGroup != null ? currentGroup : container.getGroup());
                                     PacketDistributor.sendToServer(p);
                                     return;
                                 }
@@ -297,9 +379,16 @@ public class LabeledPatternAccessTerminalScreen extends AEBaseScreen<LabeledPatt
                         }
                         default:
                             var tag = (this.getMenu()).currentTag;
-                            if (clickType == ClickType.QUICK_MOVE && !tag.isEmpty()) {
+                            PatternContainerGroup validGroup = currentGroup;
+                            if (validGroup == null) {
+                                validGroup = mouseButton == 1 ? lastShownGroup : firstShownGroup;
+                            }
+                            if (validGroup == null)
+                                return;
+                            if (clickType == ClickType.QUICK_MOVE) {
                                 InventoryQuickMovePacket p = new InventoryQuickMovePacket(
-                                        slot.getSlotIndex());
+                                        slot.getSlotIndex(),
+                                        validGroup);
                                 PacketDistributor.sendToServer(p);
                                 return;
                             }
@@ -415,6 +504,13 @@ public class LabeledPatternAccessTerminalScreen extends AEBaseScreen<LabeledPatt
     public void updateBeforeRender() {
         this.showPatternProviders.set((this.menu).getShownProviders());
         this.moveConvenienceButton.set((this.menu).getMoveConvenience());
+        this.showGroupSelectRatioButton.set((this.menu).getShowGroupSelectRatio());
+        var lastGroupSelectRatio = isShowGroupSelectRatio;
+        isShowGroupSelectRatio = this.menu.getShowGroupSelectRatio() == YesNo.YES;
+        if (lastGroupSelectRatio && !isShowGroupSelectRatio) {
+            this.clearCheckboxes();
+        }
+
         var currentTag = (this.menu).currentTag;
         this.cycleTagButton.setExtraTooltip(List.of(currentTag.isEmpty() ?
                 GUIText.LabeledTerminalCycleTagButtonEmptyFocus.text() :
@@ -471,6 +567,7 @@ public class LabeledPatternAccessTerminalScreen extends AEBaseScreen<LabeledPatt
         }
 
         this.resetScrollbar();
+        this.clearCheckboxes();
     }
 
     private void resetScrollbar() {

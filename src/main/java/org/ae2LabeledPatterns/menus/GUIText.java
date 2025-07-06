@@ -31,7 +31,11 @@ public enum GUIText implements LocalizationEnum {
             "将相同的样板插入到的每一个样板供应器中"),
     MoveConvenienceButtonForAllStrict("Strictly insert the same pattern to all pattern providers.",
             "严格地将相同的样板插入到的每一个样板供应器中。"),
+    ShowGroupSelectRatioTitle("Show Group Select Check box", "显示组选择按钮"),
+    ShowGroupSelectRatioYes("Check box is shown", "按钮显示"),
+    ShowGroupSelectRatioNo("Check box is hidden", "按钮隐藏"),
     ;
+
     private final String root = "gui." + Ae2LabeledPatterns.MODID;
 
     @NotNull

@@ -45,4 +45,5 @@ public class MSettings {
     public static Setting<YesNo> LABELER_INPUT_LOCKED = RegiterSetting("labeler_input_locked", YesNo.YES, YesNo.NO);
     public static Setting<MoveConvenience> TERMINAL_MOVE_CONVENIENCE = RegiterSetting("terminal_move_convenience",
             MoveConvenience.class);
+    public static Setting<YesNo> TERMINAL_SHOW_GROUP_SELECT_RATIO = RegiterSetting("terminal_show_group_select_ratio", YesNo.YES, YesNo.NO);
 }
