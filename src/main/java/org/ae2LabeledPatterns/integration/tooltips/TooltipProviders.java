@@ -28,13 +28,7 @@ public class TooltipProviders implements TooltipProvider {
                 new PatternProviderDataProvider(),
                 DEFAULT_PRIORITY - 1
         );
-//        registration.addBlockEntityBody(
-//                MyBlockEntity.class,
-//                MyEntityBlock.class,
-//                PATTERN_PROVIDER_LABEL,
-//                new PatternProviderDataProvider(),
-//                DEFAULT_PRIORITY + 1
-//        );
+
     }
 
     @Override
@@ -44,15 +38,10 @@ public class TooltipProviders implements TooltipProvider {
                 PATTERN_PROVIDER_LABEL,
                 AEBaseBlockEntity.class,
                 new PatternProviderDataProvider());
-//        registration.addBlockEntityData(
-//                PATTERN_PROVIDER_LABEL,
-//                MyBlockEntity.class,
-//                new PatternProviderDataProvider());
     }
 
     @Override
     public void registerBlockEntityBaseClasses(BaseClassRegistration registration) {
-//        LOG.debug("Registering base block entity classes for {}", PATTERN_PROVIDER_LABEL);
-//        registration.addBaseBlockEntity(MyBlockEntity.class, MyEntityBlock.class);
+
     }
 }

@@ -44,7 +44,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
-import org.ae2LabeledPatterns.MSettings;
+import org.ae2LabeledPatterns.config.MSettings;
 import org.ae2LabeledPatterns.menus.widgets.MActionButton;
 import org.ae2LabeledPatterns.menus.widgets.MServerSettingToggleButton;
 import org.ae2LabeledPatterns.network.InventoryQuickMovePacket;

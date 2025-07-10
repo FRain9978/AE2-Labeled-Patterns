@@ -10,7 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.ae2LabeledPatterns.Ae2LabeledPatterns;
-import org.ae2LabeledPatterns.blocks.attachments.AttachmentRegisters;
+import org.ae2LabeledPatterns.attachments.AttachmentRegisters;
 import org.ae2LabeledPatterns.items.components.PatternProviderLabel;
 
 public record SaveLabelAttachmentPacket(

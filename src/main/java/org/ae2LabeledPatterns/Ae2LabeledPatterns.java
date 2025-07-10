@@ -2,13 +2,11 @@ package org.ae2LabeledPatterns;
 
 import appeng.api.ids.AECreativeTabIds;
 import appeng.core.network.ServerboundPacket;
-import appeng.core.network.serverbound.MouseWheelPacket;
 import appeng.helpers.IMouseWheelItem;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -18,7 +16,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.api.distmarker.Dist;
@@ -28,8 +25,6 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.common.NeoForge;
@@ -40,8 +35,7 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import org.ae2LabeledPatterns.blocks.BlockRegisters;
-import org.ae2LabeledPatterns.blocks.attachments.AttachmentRegisters;
+import org.ae2LabeledPatterns.attachments.AttachmentRegisters;
 import org.ae2LabeledPatterns.items.IMMouseWheelItem;
 import org.ae2LabeledPatterns.items.ItemRegisters;
 import org.ae2LabeledPatterns.items.components.ComponentRegisters;
@@ -78,7 +72,6 @@ public class Ae2LabeledPatterns {
                     .withTabsBefore(AECreativeTabIds.MAIN).icon(() -> ItemRegisters.LABELER.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
                         output.accept(ItemRegisters.LABELER.get());
-                        output.accept(BlockRegisters.MY_BLOCK.get());
                         output.accept(PartRegisters.LABELED_PATTERN_ACCESS_TERMINAL.get());
     }).build());
 
@@ -93,9 +86,7 @@ public class Ae2LabeledPatterns {
 
         // Register the Deferred Register to the mod event bus so blocks get registered
         BLOCKS.register(modEventBus);
-        BlockRegisters.BLOCKS.register(modEventBus);
 
-        BlockRegisters.BLOCK_ENTITY_TYPES.register(modEventBus);
         // Register the Deferred Register to the mod event bus so items get registered
         ITEMS.register(modEventBus);
         ItemRegisters.ITEMS.register(modEventBus);
@@ -104,7 +95,6 @@ public class Ae2LabeledPatterns {
 
         modEventBus.addListener(InitNetwork::init);
 
-        modEventBus.addListener(InitCapabilities::register);
 //        modEventBus.addListener(InitScreens::register);
 //        modEventBus.addListener(PartRegisters::registerModels);
         PartRegisters.PARTS.register(modEventBus);
@@ -216,9 +206,15 @@ public class Ae2LabeledPatterns {
                 downIndex = 2;
             }
             if (downIndex != 0){
-                var mainHand = player.getItemInHand(InteractionHand.MAIN_HAND)
-                        .getItem() instanceof IMMouseWheelItem;
-                var offHand = player.getItemInHand(InteractionHand.OFF_HAND).getItem() instanceof IMouseWheelItem;
+                boolean mainHand = false;
+                if (player != null) {
+                    mainHand = player.getItemInHand(InteractionHand.MAIN_HAND)
+                            .getItem() instanceof IMMouseWheelItem;
+                }
+                boolean offHand = false;
+                if (player != null) {
+                    offHand = player.getItemInHand(InteractionHand.OFF_HAND).getItem() instanceof IMouseWheelItem;
+                }
 
                 if (mainHand || offHand) {
                     ServerboundPacket message = new MMouseWheelPacket(event.getScrollDeltaY() > 0, downIndex);

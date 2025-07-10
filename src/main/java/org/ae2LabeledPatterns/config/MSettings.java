@@ -1,9 +1,8 @@
-package org.ae2LabeledPatterns;
+package org.ae2LabeledPatterns.config;
 
 import appeng.api.config.Setting;
 import appeng.api.config.Settings;
 import appeng.api.config.YesNo;
-import org.ae2LabeledPatterns.items.components.LabelerMode;
 import org.ae2LabeledPatterns.menus.MoveConvenience;
 
 import java.lang.reflect.Method;

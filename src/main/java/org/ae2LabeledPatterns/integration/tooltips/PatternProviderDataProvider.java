@@ -7,7 +7,7 @@ import appeng.api.integrations.igtooltip.providers.ServerDataProvider;
 import appeng.blockentity.AEBaseBlockEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
-import org.ae2LabeledPatterns.blocks.attachments.AttachmentRegisters;
+import org.ae2LabeledPatterns.attachments.AttachmentRegisters;
 import org.ae2LabeledPatterns.items.components.PatternProviderLabel;
 
 @SuppressWarnings({"UnstableApiUsage", "NonExtendableApiUsage"})

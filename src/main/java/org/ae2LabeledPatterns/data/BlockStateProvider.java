@@ -7,7 +7,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import org.ae2LabeledPatterns.Ae2LabeledPatterns;
-import org.ae2LabeledPatterns.blocks.BlockRegisters;
 import org.ae2LabeledPatterns.parts.PartRegisters;
 
 public class BlockStateProvider extends AE2BlockStateProvider {
@@ -17,8 +16,6 @@ public class BlockStateProvider extends AE2BlockStateProvider {
 
     @Override
     protected void registerStatesAndModels() {
-        blockWithItem(BlockRegisters.MY_BLOCK);
-
         registerTerminalPartModel(
                 PartRegisters.LABELED_PATTERN_ACCESS_TERMINAL.getId(),
                 "pattern_access_terminal"

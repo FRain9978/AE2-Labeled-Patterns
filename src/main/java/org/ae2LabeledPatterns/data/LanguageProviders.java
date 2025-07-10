@@ -4,7 +4,6 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 import org.ae2LabeledPatterns.Ae2LabeledPatterns;
-import org.ae2LabeledPatterns.blocks.BlockRegisters;
 import org.ae2LabeledPatterns.integration.tooltips.InGameTooltip;
 import org.ae2LabeledPatterns.integration.tooltips.TooltipProviders;
 import org.ae2LabeledPatterns.items.ItemRegisters;
@@ -32,9 +31,6 @@ public class LanguageProviders {
                 this.add(gui.getTranslationKey(), gui.getChineseText());
             }
 
-            this.addBlock(BlockRegisters.MY_BLOCK, "我的方块");
-
-            this.addItem(ItemRegisters.MY_ITEM, "我的物品");
             this.addItem(ItemRegisters.LABELER, "标签工具");
             this.addItem(PartRegisters.LABELED_PATTERN_ACCESS_TERMINAL, "ME标签化样板访问终端");
         }
@@ -60,9 +56,6 @@ public class LanguageProviders {
                 this.add(gui.getTranslationKey(), gui.getEnglishText());
             }
 
-            this.addBlock(BlockRegisters.MY_BLOCK, "My Block");
-
-            this.addItem(ItemRegisters.MY_ITEM, "My Item");
             this.addItem(ItemRegisters.LABELER, "Labeler");
             this.addItem(PartRegisters.LABELED_PATTERN_ACCESS_TERMINAL, "ME Labeled Pattern Access Terminal");
 

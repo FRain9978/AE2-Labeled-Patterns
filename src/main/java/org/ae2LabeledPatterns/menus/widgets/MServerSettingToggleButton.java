@@ -7,7 +7,7 @@ import appeng.client.gui.widgets.ServerSettingToggleButton;
 import appeng.client.gui.widgets.SettingToggleButton;
 import com.mojang.logging.LogUtils;
 import net.minecraft.network.chat.Component;
-import org.ae2LabeledPatterns.MSettings;
+import org.ae2LabeledPatterns.config.MSettings;
 import org.ae2LabeledPatterns.menus.GUIText;
 import org.ae2LabeledPatterns.menus.MoveConvenience;
 
