@@ -13,5 +13,6 @@ public class ItemModelProvider extends net.neoforged.neoforge.client.model.gener
     @Override
     protected void registerModels() {
         basicItem(ItemRegisters.LABELER.get());
+
     }
 }

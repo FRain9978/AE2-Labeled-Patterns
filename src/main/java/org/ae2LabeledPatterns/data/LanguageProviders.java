@@ -9,6 +9,7 @@ import org.ae2LabeledPatterns.integration.tooltips.InGameTooltip;
 import org.ae2LabeledPatterns.integration.tooltips.TooltipProviders;
 import org.ae2LabeledPatterns.items.ItemRegisters;
 import org.ae2LabeledPatterns.menus.GUIText;
+import org.ae2LabeledPatterns.parts.PartRegisters;
 
 public class LanguageProviders {
     public static class ChineseLanguageProvider extends LanguageProvider{
@@ -21,8 +22,8 @@ public class LanguageProviders {
         protected void addTranslations() {
             this.add("creativetab.ae2labeledpatterns.main", "AE2标签化样板");
             this.add(Ae2LabeledPatterns.ClientModEvents.KEYBINDING_MOD_CATEGORY, "AE2标签化样板");
-            this.add(Ae2LabeledPatterns.ClientModEvents.KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_1_DESCRIPTION, "用鼠标滚轮物品的修饰键1");
-            this.add(Ae2LabeledPatterns.ClientModEvents.KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_2_DESCRIPTION, "用鼠标滚轮物品的修饰键2");
+            this.add(Ae2LabeledPatterns.ClientModEvents.KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_1_DESCRIPTION, "鼠标滚轮物品修饰键1");
+            this.add(Ae2LabeledPatterns.ClientModEvents.KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_2_DESCRIPTION, "鼠标滚轮物品修饰键2");
 
             for (var gui: GUIText.values()){
                 this.add(gui.getTranslationKey(), gui.getChineseText());
@@ -35,6 +36,7 @@ public class LanguageProviders {
 
             this.addItem(ItemRegisters.MY_ITEM, "我的物品");
             this.addItem(ItemRegisters.LABELER, "标签工具");
+            this.addItem(PartRegisters.LABELED_PATTERN_ACCESS_TERMINAL, "ME标签化样板访问终端");
         }
     }
 
@@ -62,6 +64,7 @@ public class LanguageProviders {
 
             this.addItem(ItemRegisters.MY_ITEM, "My Item");
             this.addItem(ItemRegisters.LABELER, "Labeler");
+            this.addItem(PartRegisters.LABELED_PATTERN_ACCESS_TERMINAL, "ME Labeled Pattern Access Terminal");
 
             addJadeProviderDisplayName(TooltipProviders.PATTERN_PROVIDER_LABEL, Ae2LabeledPatterns.MODID.toUpperCase() + "Pattern Provider Label");
         }

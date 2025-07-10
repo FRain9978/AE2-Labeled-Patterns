@@ -30,10 +30,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.client.event.ModelEvent;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
@@ -111,6 +108,7 @@ public class Ae2LabeledPatterns {
 //        modEventBus.addListener(InitScreens::register);
 //        modEventBus.addListener(PartRegisters::registerModels);
         PartRegisters.PARTS.register(modEventBus);
+//        PartRegisters.registerModels();
 
         // Register the Deferred Register to the mod event bus so tabs get registered
         CREATIVE_MODE_TABS.register(modEventBus);
@@ -183,7 +181,8 @@ public class Ae2LabeledPatterns {
 
         @SubscribeEvent
         public static void registerModels(ModelEvent.RegisterAdditional event){
-            PartRegisters.registerModels(event);
+//            PartRegisters.registerModels(event);
+            PartRegisters.registerModels();
         }
 
         @SubscribeEvent
@@ -191,6 +190,11 @@ public class Ae2LabeledPatterns {
             // Register the key mappings for mouse wheel item modifiers
             event.register(MOUSE_WHEEL_ITEM_MODIFIER_1);
             event.register(MOUSE_WHEEL_ITEM_MODIFIER_2);
+        }
+
+        @SubscribeEvent
+        public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
+            PartRegisters.registerColor(event);
         }
     }
 

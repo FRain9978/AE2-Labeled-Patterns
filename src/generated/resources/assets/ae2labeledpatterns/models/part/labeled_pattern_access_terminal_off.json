@@ -1,0 +1,8 @@
+{
+  "parent": "ae2:part/pattern_access_terminal_off",
+  "textures": {
+    "lightsBright": "ae2labeledpatterns:part/labeled_pattern_access_terminal_bright",
+    "lightsDark": "ae2labeledpatterns:part/labeled_pattern_access_terminal_dark",
+    "lightsMedium": "ae2labeledpatterns:part/labeled_pattern_access_terminal_medium"
+  }
+}
