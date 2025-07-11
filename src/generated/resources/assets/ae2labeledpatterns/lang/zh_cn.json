@@ -1,7 +1,7 @@
 {
   "creativetab.ae2labeledpatterns.main": "AE2标签化样板",
   "gui.ae2labeledpatterns.labeledterminalcycletagbuttonemptyfocus": "无关注标签",
-  "gui.ae2labeledpatterns.labeledterminalcycletagbuttonfocusing": "当前: %s, 颜色: %s",
+  "gui.ae2labeledpatterns.labeledterminalcycletagbuttonfocusing": "当前: %s",
   "gui.ae2labeledpatterns.labeledterminalcycletagbuttonmessage": "标签过滤",
   "gui.ae2labeledpatterns.labelereditconfirm": "确认",
   "gui.ae2labeledpatterns.labelereditlock": "输入锁定",
@@ -30,6 +30,8 @@
   "waila.ae2labeledpatterns.labelerareasetproviderlabel": "区域标签设置为 %s",
   "waila.ae2labeledpatterns.labelerclearproviderlabel": "标签已清除",
   "waila.ae2labeledpatterns.labelercopiedlabel": "已复制标签: %s",
+  "waila.ae2labeledpatterns.labelerhovertooltiplabel": "标签: %s",
+  "waila.ae2labeledpatterns.labelerhovertooltipmode": "模式: %s",
   "waila.ae2labeledpatterns.labelermodeareaclear": "清除(区域)",
   "waila.ae2labeledpatterns.labelermodeareaset": "应用(区域)",
   "waila.ae2labeledpatterns.labelermodecopy": "复制",
@@ -39,5 +41,5 @@
   "waila.ae2labeledpatterns.labelerselectedareatoobig": "范围太大，最大为%d方块空间",
   "waila.ae2labeledpatterns.labelerselectfirstpoint": "第一个点已选择",
   "waila.ae2labeledpatterns.labelersetproviderlabel": "标签设置为 %s",
-  "waila.ae2labeledpatterns.patternproviderlabel": "标签: %s，颜色: %s"
+  "waila.ae2labeledpatterns.patternproviderlabel": "标签: %s"
 }

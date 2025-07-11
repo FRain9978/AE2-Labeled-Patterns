@@ -7,7 +7,10 @@ import org.ae2LabeledPatterns.Ae2LabeledPatterns;
 import org.jetbrains.annotations.NotNull;
 
 public enum InGameTooltip implements LocalizationEnum {
-    PatternProviderLabel("Label: %s, Color: %s","标签: %s，颜色: %s"),
+    PatternProviderLabel("Label: %s","标签: %s"),
+
+    LabelerHoverTooltipLabel("Label: %s", "标签: %s"),
+    LabelerHoverTooltipMode("Mode: %s", "模式: %s"),
 
     CycleLabelerMode("Current mode: %s", "当前模式: %s"),
     LabelerModeSingleSet("Set(Single)", "应用(单个)"),

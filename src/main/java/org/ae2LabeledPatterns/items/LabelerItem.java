@@ -38,6 +38,7 @@ import org.ae2LabeledPatterns.network.SaveLabelAttachmentPacket;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -66,8 +67,12 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
-        var selfData = stack.getComponents().getOrDefault(ComponentRegisters.PATTERN_PROVIDER_LABEL.get(), new PatternProviderLabel("sample"));
-        tooltipComponents.add(Component.literal(String.format("name: %s color: %s", selfData.name(), selfData.color())).withColor(TextColor.parseColor(selfData.color().toString().substring(0, 7)).getOrThrow().getValue()));
+        var selfData = stack.getComponents().getOrDefault(ComponentRegisters.PATTERN_PROVIDER_LABEL.get(), new PatternProviderLabel("Sample"));
+        var currentSetting = stack.get(LABELER_SETTING.get());
+        tooltipComponents.add(InGameTooltip.LabelerHoverTooltipLabel.text(selfData.name()).withColor(Color.GREEN.getRGB()));
+        if (currentSetting != null) {
+            tooltipComponents.add(InGameTooltip.LabelerHoverTooltipMode.text(currentSetting.mode().text()).withColor(Color.CYAN.getRGB()));
+        }
     }
 
     @Override
@@ -92,6 +97,7 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
         ItemStack itemStack = context.getItemInHand();
         if (itemStack.getItem() instanceof LabelerItem){
             var setting = itemStack.get(LABELER_SETTING.get());
+            if (setting == null) return InteractionResult.PASS;
             switch (setting.mode()){
                 case LabelerMode.SINGLE_SET:{
                     if (blockEntity instanceof PatternProviderLogicHost){
@@ -303,7 +309,7 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                 var newValue = EnumCycler.rotateEnum(currentValue, up, Set.of(LabelerMode.values()));
                 is.set(LABELER_SETTING.get(), new LabelerSetting(setting.isLockEdit(), newValue));
                 is.update(MULTI_BLOCK_TARGET.get(), new MultiBlockTarget(), MultiBlockTarget::clear);
-                serverPlayer.displayClientMessage(InGameTooltip.CycleLabelerMode.text(newValue.text()), true);
+                serverPlayer.displayClientMessage(InGameTooltip.CycleLabelerMode.text(newValue.text()).withColor(Color.CYAN.getRGB()), true);
             }
         } else if (index == 2 && is.has(SAVED_LABELS)) {
             var savedLabels = is.get(SAVED_LABELS.get());
@@ -314,7 +320,7 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                 var nextIndex = up ? (currentLabelIndex + 1) % savedLabels.size() : (currentLabelIndex - 1 + savedLabels.size()) % savedLabels.size();
                 var nextLabel = savedLabels.get(nextIndex);
                 is.set(PATTERN_PROVIDER_LABEL.get(), nextLabel);
-                serverPlayer.displayClientMessage(InGameTooltip.CycleLabelerLabel.text(nextLabel.name()), true);
+                serverPlayer.displayClientMessage(InGameTooltip.CycleLabelerLabel.text(nextLabel.name()).withColor(Color.GREEN.getRGB()), true);
             }
         }
 

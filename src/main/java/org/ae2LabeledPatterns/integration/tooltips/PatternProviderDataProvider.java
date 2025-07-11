@@ -26,7 +26,7 @@ public final class PatternProviderDataProvider
             if (!labelData.isEmpty()){
                 var label = PatternProviderLabel.readFromNBT(labelData);
                 if (!label.isEmpty()) {
-                    tooltip.addLine(InGameTooltip.PatternProviderLabel.text(label.name(), label.color().toString()));
+                    tooltip.addLine(InGameTooltip.PatternProviderLabel.text(label.name()));
                 }
             }
         }

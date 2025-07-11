@@ -18,7 +18,7 @@ public enum GUIText implements LocalizationEnum {
     LabelListDelete("Delete", "删除"),
     LabeledTerminalCycleTagButtonMessage("Label Filter ", "标签过滤"),
     LabeledTerminalCycleTagButtonEmptyFocus("No Focusing label", "无关注标签"),
-    LabeledTerminalCycleTagButtonFocusing("Focusing: %s, Color: %s", "当前: %s, 颜色: %s"),
+    LabeledTerminalCycleTagButtonFocusing("Focusing: %s", "当前: %s"),
 
     // -------------------button text-------------------
     MoveConvenienceButtonTitle("Quick Move Convenience", "快速移动方式"),

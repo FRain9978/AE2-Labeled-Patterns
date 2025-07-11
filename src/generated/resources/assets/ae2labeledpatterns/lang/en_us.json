@@ -2,7 +2,7 @@
   "config.jade.plugin_ae2labeledpatterns.pattern_provider_label": "AE2LABELEDPATTERNSPattern Provider Label",
   "creativetab.ae2labeledpatterns.main": "AE2 Labeled Patterns",
   "gui.ae2labeledpatterns.labeledterminalcycletagbuttonemptyfocus": "No Focusing label",
-  "gui.ae2labeledpatterns.labeledterminalcycletagbuttonfocusing": "Focusing: %s, Color: %s",
+  "gui.ae2labeledpatterns.labeledterminalcycletagbuttonfocusing": "Focusing: %s",
   "gui.ae2labeledpatterns.labeledterminalcycletagbuttonmessage": "Label Filter ",
   "gui.ae2labeledpatterns.labelereditconfirm": "Confirm",
   "gui.ae2labeledpatterns.labelereditlock": "Lock Edit",
@@ -31,6 +31,8 @@
   "waila.ae2labeledpatterns.labelerareasetproviderlabel": "Set area label to %s",
   "waila.ae2labeledpatterns.labelerclearproviderlabel": "Label cleared",
   "waila.ae2labeledpatterns.labelercopiedlabel": "Copied label: %s",
+  "waila.ae2labeledpatterns.labelerhovertooltiplabel": "Label: %s",
+  "waila.ae2labeledpatterns.labelerhovertooltipmode": "Mode: %s",
   "waila.ae2labeledpatterns.labelermodeareaclear": "Clear(Area)",
   "waila.ae2labeledpatterns.labelermodeareaset": "Set(Area)",
   "waila.ae2labeledpatterns.labelermodecopy": "Copy",
@@ -40,5 +42,5 @@
   "waila.ae2labeledpatterns.labelerselectedareatoobig": "The area is too big, maximum is %d block space.",
   "waila.ae2labeledpatterns.labelerselectfirstpoint": "First point selected",
   "waila.ae2labeledpatterns.labelersetproviderlabel": "Set label to %s",
-  "waila.ae2labeledpatterns.patternproviderlabel": "Label: %s, Color: %s"
+  "waila.ae2labeledpatterns.patternproviderlabel": "Label: %s"
 }

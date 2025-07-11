@@ -54,16 +54,16 @@ public class Ae2LabeledPatterns {
     // Directly reference a slf4j logger
     private static final Logger LOGGER = LogUtils.getLogger();
     // Create a Deferred Register to hold Blocks which will all be registered under the "ae2patterntagger" namespace
-    public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MODID);
+//    public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MODID);
     // Create a Deferred Register to hold Items which will all be registered under the "ae2patterntagger" namespace
-    public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
+//    public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MODID);
     // Create a Deferred Register to hold CreativeModeTabs which will all be registered under the "ae2patterntagger" namespace
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
 
     // Creates a new Block with the id "ae2patterntagger:example_block", combining the namespace and path
-    public static final DeferredBlock<Block> EXAMPLE_BLOCK = BLOCKS.registerSimpleBlock("example_block", BlockBehaviour.Properties.of().mapColor(MapColor.STONE).destroyTime(1f).lightLevel(blockState -> 15));
+//    public static final DeferredBlock<Block> EXAMPLE_BLOCK = BLOCKS.registerSimpleBlock("example_block", BlockBehaviour.Properties.of().mapColor(MapColor.STONE).destroyTime(1f).lightLevel(blockState -> 15));
     // Creates a new BlockItem with the id "ae2patterntagger:example_block", combining the namespace and path
-    public static final DeferredItem<BlockItem> EXAMPLE_BLOCK_ITEM = ITEMS.registerSimpleBlockItem("example_block", EXAMPLE_BLOCK);
+//    public static final DeferredItem<BlockItem> EXAMPLE_BLOCK_ITEM = ITEMS.registerSimpleBlockItem("example_block", EXAMPLE_BLOCK);
 
     // Creates a creative tab with the id "ae2patterntagger:example_tab" for the example item, that is placed after the combat tab
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> CREATIVE_TAB = CREATIVE_MODE_TABS.register("ae2_pattern_tagger", () ->
@@ -85,10 +85,10 @@ public class Ae2LabeledPatterns {
         AttachmentRegisters.ATTACHMENTS.register(modEventBus);
 
         // Register the Deferred Register to the mod event bus so blocks get registered
-        BLOCKS.register(modEventBus);
+//        BLOCKS.register(modEventBus);
 
         // Register the Deferred Register to the mod event bus so items get registered
-        ITEMS.register(modEventBus);
+//        ITEMS.register(modEventBus);
         ItemRegisters.ITEMS.register(modEventBus);
 
         MenuRegisters.MENUS.register(modEventBus);
@@ -109,7 +109,7 @@ public class Ae2LabeledPatterns {
         NeoForge.EVENT_BUS.register(this);
 
         // Register the item to a creative tab
-        modEventBus.addListener(this::addCreative);
+//        modEventBus.addListener(this::addCreative);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
@@ -131,9 +131,9 @@ public class Ae2LabeledPatterns {
     }
 
     // Add the example block item to the building blocks tab
-    private void addCreative(BuildCreativeModeTabContentsEvent event) {
-        if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) event.accept(EXAMPLE_BLOCK_ITEM);
-    }
+//    private void addCreative(BuildCreativeModeTabContentsEvent event) {
+//        if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) event.accept(EXAMPLE_BLOCK_ITEM);
+//    }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call
     @SubscribeEvent

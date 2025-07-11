@@ -514,7 +514,7 @@ public class LabeledPatternAccessTerminalScreen extends AEBaseScreen<LabeledPatt
         var currentTag = (this.menu).currentTag;
         this.cycleTagButton.setExtraTooltip(List.of(currentTag.isEmpty() ?
                 GUIText.LabeledTerminalCycleTagButtonEmptyFocus.text() :
-                GUIText.LabeledTerminalCycleTagButtonFocusing.text(currentTag.name(), currentTag.color().toString())));
+                GUIText.LabeledTerminalCycleTagButtonFocusing.text(currentTag.name())));
     }
 
     private void refreshList() {
