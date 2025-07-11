@@ -44,7 +44,7 @@ public class LabelerScreen extends AEBaseScreen<LabelerMenu> {
 //            }
 //        }, GUIText.LabelerEditConfirm.text());
 
-        saveButton = new MActionButton(Icon.VIEW_MODE_ALL, (button) -> {
+        saveButton = new MActionButton(Icon.STORAGE_FILTER_EXTRACTABLE_NONE, (button) -> {
             var text = this.inputField.getValue();
             if (!text.isBlank()) {
                 this.menu.saveLabel(new PatternProviderLabel(text));

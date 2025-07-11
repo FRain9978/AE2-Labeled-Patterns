@@ -52,7 +52,7 @@ public class LabelListScreen<C extends AEBaseMenu & ILabelsProvider, P extends A
         scrollbar = widgets.addScrollBar("scrollbar", Scrollbar.BIG);
         scrollbar.setRange(0, Math.max(labelsProvider.getLabels().size() - 6, 0), 1);
 
-        selectButton = new MActionButton(Icon.VIEW_MODE_CRAFTING, (button) -> {
+        selectButton = new MActionButton(Icon.ENTER, (button) -> {
             var labels = labelsProvider.getLabels();
             if (labels.size() > scrollbar.getCurrentScroll() && currentSelectedIndex >= 0) {
                 var label = labels.get(currentSelectedIndex);
@@ -62,7 +62,7 @@ public class LabelListScreen<C extends AEBaseMenu & ILabelsProvider, P extends A
         addRenderableWidget(selectButton);
         selectButton.visible = false;
 
-        deleteButton = new MActionButton(Icon.VIEW_MODE_ALL, (button) -> {
+        deleteButton = new MActionButton(Icon.CLEAR, (button) -> {
             var labels = labelsProvider.getLabels();
             if (labels.size() > scrollbar.getCurrentScroll() && currentSelectedIndex >= 0) {
                 var label = labels.get(currentSelectedIndex);

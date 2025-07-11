@@ -95,21 +95,21 @@ public class MServerSettingToggleButton<T extends Enum<T>> extends ServerSetting
     }
     private static void initializeAppearances() {
         addAppearance(
-                Icon.ACCESS_READ_WRITE,
+                Icon.ARROW_RIGHT,
                 MSettings.TERMINAL_MOVE_CONVENIENCE,
                 MoveConvenience.NONE,
                 GUIText.MoveConvenienceButtonTitle.text(),
                 GUIText.MoveConvenienceButtonNone.text()
         );
         addAppearance(
-                Icon.ACCESS_READ,
+                Icon.BLOCKING_MODE_NO,
                 MSettings.TERMINAL_MOVE_CONVENIENCE,
                 MoveConvenience.ONCE_FOR_ALL,
                 GUIText.MoveConvenienceButtonTitle.text(),
                 GUIText.MoveConvenienceButtonForAll.text()
         );
         addAppearance(
-                Icon.ACCESS_WRITE,
+                Icon.BLOCKING_MODE_YES,
                 MSettings.TERMINAL_MOVE_CONVENIENCE,
                 MoveConvenience.ONCE_FOR_ALL_STRICT,
                 GUIText.MoveConvenienceButtonTitle.text(),

@@ -2,7 +2,7 @@
   "parent": "ae2:item/pattern_access_terminal",
   "textures": {
     "front_bright": "ae2labeledpatterns:part/labeled_pattern_access_terminal_bright",
-    "front_medium": "ae2labeledpatterns:part/labeled_pattern_access_terminal_medium",
-    "front_dark": "ae2labeledpatterns:part/labeled_pattern_access_terminal_dark"
+    "front_dark": "ae2labeledpatterns:part/labeled_pattern_access_terminal_dark",
+    "front_medium": "ae2labeledpatterns:part/labeled_pattern_access_terminal_medium"
   }
 }

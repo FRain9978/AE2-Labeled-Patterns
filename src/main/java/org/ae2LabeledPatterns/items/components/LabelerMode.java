@@ -9,6 +9,7 @@ public enum LabelerMode implements IModeComponent {
     AREA_SET(InGameTooltip.LabelerModeAreaSet.text()),
     SINGLE_CLEAR(InGameTooltip.LabelerModeSingleClear.text()),
     AREA_CLEAR(InGameTooltip.LabelerModeAreaClear.text()),
+    COPY(InGameTooltip.LabelerModeCopy.text())
     ;
 
     private final Component component;

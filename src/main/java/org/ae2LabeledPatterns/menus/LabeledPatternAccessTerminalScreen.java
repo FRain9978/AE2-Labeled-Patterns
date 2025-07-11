@@ -112,7 +112,7 @@ public class LabeledPatternAccessTerminalScreen extends AEBaseScreen<LabeledPatt
         this.searchField.setResponder((str) -> this.refreshList());
         this.searchField.setPlaceholder(GuiText.SearchPlaceholder.text());
 
-        cycleTagButton = new MActionButton(Icon.PRIORITY,
+        cycleTagButton = new MActionButton(Icon.SORT_BY_MOD,
                 (button) -> {
                    this.menu.cycleTag(isHandlingRightClick());
                 },

@@ -14,6 +14,7 @@ public enum InGameTooltip implements LocalizationEnum {
     LabelerModeSingleClear("Clear(Single)", "清除(单个)"),
     LabelerModeAreaSet("Set(Area)", "应用(区域)"),
     LabelerModeAreaClear("Clear(Area)", "清除(区域)"),
+    LabelerModeCopy("Copy", "复制"),
     CycleLabelerLabel("Current label: %s", "当前标签: %s"),
 
     LabelerSelectedAreaTooBig("The area is too big, maximum is %d block space.", "范围太大，最大为%d方块空间"),
@@ -23,6 +24,7 @@ public enum InGameTooltip implements LocalizationEnum {
     LabelerAreaSetProviderLabel("Set area label to %s", "区域标签设置为 %s"),
     LabelerClearProviderLabel("Label cleared", "标签已清除"),
     LabelerAreaClearProviderLabel("Area label cleared", "区域标签已清除"),
+    LabelerCopiedLabel("Copied label: %s", "已复制标签: %s"),
     ;
     private final String root = "waila." + Ae2LabeledPatterns.MODID;
 

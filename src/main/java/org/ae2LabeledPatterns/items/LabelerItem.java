@@ -28,6 +28,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
+import org.ae2LabeledPatterns.Config;
 import org.ae2LabeledPatterns.config.MSettings;
 import org.ae2LabeledPatterns.attachments.AttachmentRegisters;
 import org.ae2LabeledPatterns.integration.tooltips.InGameTooltip;
@@ -37,13 +38,14 @@ import org.ae2LabeledPatterns.network.SaveLabelAttachmentPacket;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import static org.ae2LabeledPatterns.items.components.ComponentRegisters.*;
 
 public class LabelerItem extends Item implements IMenuItem, IConfigurableObject, IMMouseWheelItem {
-    private final int maxEntityCountInMultiSetMode = 64; // Maximum number of entities that can be set in multi-set mode
+//    private final int maxEntityCountInMultiSetMode = 64; // Maximum number of entities that can be set in multi-set mode
 
     private final IConfigManager configManager;
 
@@ -86,6 +88,7 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
         BlockEntity blockEntity = level.getBlockEntity(context.getClickedPos());
         Player player = context.getPlayer();
         if (player == null) return InteractionResult.PASS;
+        if (blockEntity == null) return InteractionResult.PASS;
         ItemStack itemStack = context.getItemInHand();
         if (itemStack.getItem() instanceof LabelerItem){
             var setting = itemStack.get(LABELER_SETTING.get());
@@ -137,9 +140,9 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                         }
                         var p1 = t1.pos();
                         var p2 = t2.pos();
-                        if (getAreaEntityCount(p1, p2) > maxEntityCountInMultiSetMode){
+                        if (getAreaEntityCount(p1, p2) > Config.maxAllowBlockSpace){
                             itemStack.set(ComponentRegisters.MULTI_BLOCK_TARGET.get(), currentPosTarget.clear());
-                            player.sendSystemMessage(InGameTooltip.LabelerSelectedAreaTooBig.text(maxEntityCountInMultiSetMode));
+                            player.sendSystemMessage(InGameTooltip.LabelerSelectedAreaTooBig.text(Config.maxAllowBlockSpace));
                             return InteractionResult.sidedSuccess(false);
                         }
                         ServerPlayer serverPlayer = (ServerPlayer) player;
@@ -175,8 +178,8 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                         }
                         var p1 = t1.pos();
                         var p2 = t2.pos();
-                        if (getAreaEntityCount(p1, p2) > maxEntityCountInMultiSetMode){
-                            player.sendSystemMessage(InGameTooltip.LabelerSelectedAreaTooBig.text(maxEntityCountInMultiSetMode));
+                        if (getAreaEntityCount(p1, p2) > Config.maxAllowBlockSpace){
+                            player.sendSystemMessage(InGameTooltip.LabelerSelectedAreaTooBig.text(Config.maxAllowBlockSpace));
                             return InteractionResult.sidedSuccess(false);
                         }
                         ServerPlayer serverPlayer = (ServerPlayer) player;
@@ -190,6 +193,30 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                         player.sendSystemMessage(InGameTooltip.LabelerSelectFirstPoint.text());
                     }
                     return InteractionResult.sidedSuccess(false);
+                }
+                case LabelerMode.COPY:{
+                    if (level.isClientSide) {
+                        return InteractionResult.sidedSuccess(true);
+                    }
+                    if (player.isCrouching()){
+                        PatternProviderLabel data = blockEntity.getData(AttachmentRegisters.PATTERN_PROVIDER_LABEL);
+                        if (!data.isEmpty()) {
+                            var savedLabels = itemStack.get(SAVED_LABELS.get());
+                            if (savedLabels != null) {
+                                if (!savedLabels.contains(data)) {
+                                    var newSavedLabels = new ArrayList<>(savedLabels);
+                                    newSavedLabels.add(data);
+                                    itemStack.set(SAVED_LABELS.get(), newSavedLabels);
+                                }
+                            }else{
+                                itemStack.set(SAVED_LABELS.get(), List.of(data));
+                            }
+                            itemStack.set(PATTERN_PROVIDER_LABEL.get(), data);
+                            player.sendSystemMessage(InGameTooltip.LabelerCopiedLabel.text(data.name()));
+                        }
+
+                        return InteractionResult.sidedSuccess(false);
+                    }
                 }
             }
 
