@@ -90,11 +90,6 @@ public class LabeledPatternAccessTerminalScreen extends AEBaseScreen<LabeledPatt
     private final ServerSettingToggleButton<MoveConvenience> moveConvenienceButton;
     private final ServerSettingToggleButton<YesNo> showGroupSelectRatioButton;
 
-    private int firstSlotsRowIndex = -1;
-    private int lastSlotsRowIndex = -1;
-    private PatternContainerGroup firstShownGroup = null;
-    private PatternContainerGroup lastShownGroup = null;
-
     private final HashMap<PatternContainerGroup, AECheckbox> checkboxMap = new HashMap<>();
     private PatternContainerGroup currentGroup = null;
 
@@ -118,10 +113,10 @@ public class LabeledPatternAccessTerminalScreen extends AEBaseScreen<LabeledPatt
                 },
                 GUIText.LabeledTerminalCycleTagButtonMessage.text());
         addToLeftToolbar(cycleTagButton);
-        this.moveConvenienceButton = new MServerSettingToggleButton<>(MSettings.TERMINAL_MOVE_CONVENIENCE, MoveConvenience.NONE);
-        this.addToLeftToolbar(this.moveConvenienceButton);
         this.showGroupSelectRatioButton = new MServerSettingToggleButton<>(MSettings.TERMINAL_SHOW_GROUP_SELECT_RATIO, YesNo.NO);
         this.addToLeftToolbar(this.showGroupSelectRatioButton);
+        this.moveConvenienceButton = new MServerSettingToggleButton<>(MSettings.TERMINAL_MOVE_CONVENIENCE, MoveConvenience.NONE);
+        this.addToLeftToolbar(this.moveConvenienceButton);
 //        this.widgets.add("cycleTagButton", cycleTagButton);
     }
 
@@ -148,10 +143,6 @@ public class LabeledPatternAccessTerminalScreen extends AEBaseScreen<LabeledPatt
         int textColor = this.style.getColor(PaletteColor.DEFAULT_TEXT_COLOR).toARGB();
         ClientLevel level = Minecraft.getInstance().level;
         int scrollLevel = this.scrollbar.getCurrentScroll();
-        this.firstSlotsRowIndex = -1;
-        this.lastSlotsRowIndex = -1;
-        this.firstShownGroup = null;
-        this.lastShownGroup = null;
         Set<PatternContainerGroup> visibleGroups = new HashSet<>();
 
         for(int i = 0; i < this.visibleRows; ++i) {
@@ -160,10 +151,6 @@ public class LabeledPatternAccessTerminalScreen extends AEBaseScreen<LabeledPatt
                 if (row instanceof SlotsRow) {
                     SlotsRow slotsRow = (SlotsRow)row;
                     PatternContainerRecord container = slotsRow.container;
-                    if (this.firstSlotsRowIndex == -1) {
-                        this.firstSlotsRowIndex = scrollLevel + i;
-                    }
-                    this.lastSlotsRowIndex = scrollLevel + i;
 
                     for(int col = 0; col < slotsRow.slots; ++col) {
                         var slot = new PatternSlot(
@@ -185,10 +172,6 @@ public class LabeledPatternAccessTerminalScreen extends AEBaseScreen<LabeledPatt
                 } else if (row instanceof GroupHeaderRow) {
                     GroupHeaderRow headerRow = (GroupHeaderRow)row;
                     PatternContainerGroup group = headerRow.group;
-                    if (this.firstShownGroup == null) {
-                        this.firstShownGroup = group;
-                    }
-                    this.lastShownGroup = group;
                     int offsetForCheckBox = isShowGroupSelectRatio? 14 : 0;
                     if (isShowGroupSelectRatio){
                         visibleGroups.add(group);
@@ -356,68 +339,40 @@ public class LabeledPatternAccessTerminalScreen extends AEBaseScreen<LabeledPatt
 
         } else {
             // check if the playerInventorySlot is a normal inventory playerInventorySlot
-            if (slot != null && slot.container == this.getMenu().getPlayerInventory()) {
+            if (clickType == ClickType.QUICK_MOVE && slot != null && slot.container == this.getMenu().getPlayerInventory()) {
                 // check if the playerInventorySlot is a pattern item
                 ItemStack stack = slot.getItem();
                 if (!stack.isEmpty() && PatternDetailsHelper.isEncodedPattern(stack)) {
                     // check first slots row index and if it is valid
                     // then send the slots container info to server
-                    switch (this.getMenu().getMoveConvenience()){
-                        case NONE:{
-                            var container = this.getFirstValidContainer(mouseButton == 1, stack);
-                            if (container != null){
-                                if (clickType == ClickType.QUICK_MOVE) {
-                                    InventoryQuickMovePacket p = new InventoryQuickMovePacket(
-                                            slot.getSlotIndex(),
-                                            container.getServerId(),
-                                            currentGroup != null ? currentGroup : container.getGroup());
-                                    PacketDistributor.sendToServer(p);
-                                    return;
-                                }
-                            }
-                            break;
-                        }
-                        default:
-                            var tag = (this.getMenu()).currentTag;
-                            PatternContainerGroup validGroup = currentGroup;
-                            if (validGroup == null) {
-                                validGroup = mouseButton == 1 ? lastShownGroup : firstShownGroup;
-                            }
-                            if (validGroup == null)
-                                return;
-                            if (clickType == ClickType.QUICK_MOVE) {
-                                InventoryQuickMovePacket p = new InventoryQuickMovePacket(
-                                        slot.getSlotIndex(),
-                                        validGroup);
-                                PacketDistributor.sendToServer(p);
-                                return;
-                            }
+                    var rowSet = getVisibleSlotRowRecordSet();
+                    if (rowSet.isEmpty()) {
+                        return;
                     }
-
+                    InventoryQuickMovePacket p = new InventoryQuickMovePacket(
+                            slot.getSlotIndex(),
+                            mouseButton,
+                            List.copyOf(rowSet.stream().map(PatternContainerRecord::getServerId).toList()),
+                            currentGroup != null ? currentGroup : PatternContainerGroup.nothing());
+                    PacketDistributor.sendToServer(p);
                 }
             }
             super.slotClicked(slot, slotIdx, mouseButton, clickType);
         }
     }
 
-    protected PatternContainerRecord getFirstValidContainer(boolean isReversed, ItemStack stack){
-        int currentIndex = isReversed ? this.lastSlotsRowIndex : this.firstSlotsRowIndex;
-        if (currentIndex < 0 || currentIndex >= this.rows.size()) {
-            return null;
-        }
-        // make sure the container's inventory is not full otherwise increase/decrease index until find one or all check out
-        while (currentIndex >= 0 && currentIndex < this.rows.size()){
-            Row row = this.rows.get(currentIndex);
-            if (row instanceof SlotsRow slotsRow) {
-                var container = slotsRow.container;
-                AppEngInternalInventory inventory = container.getInventory();
-                if (inventory.addItems(stack, true) == ItemStack.EMPTY){
-                    return container;
+    private Set<PatternContainerRecord> getVisibleSlotRowRecordSet() {
+        Set<PatternContainerRecord> rowSet = new LinkedHashSet<>();
+        int scrollLevel = this.scrollbar.getCurrentScroll();
+        for (int i = 0; i < this.visibleRows; ++i) {
+            if (scrollLevel + i < this.rows.size()) {
+                Row row = this.rows.get(scrollLevel + i);
+                if (row instanceof SlotsRow slotsRow) {
+                    rowSet.add(slotsRow.container);
                 }
             }
-            currentIndex += isReversed ? -1 : 1;
         }
-        return null;
+        return rowSet;
     }
 
     public void drawBG(GuiGraphics guiGraphics, int offsetX, int offsetY, int mouseX, int mouseY, float partialTicks) {

@@ -279,35 +279,33 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
         }
     }
 
-    public void quickMoveToPatternContainer(ServerPlayer player, int playerInventorySlot, long containerId, PatternContainerGroup group) {
+    public void quickMoveToPatternContainer(ServerPlayer player, int playerInventorySlot, int mouseButton, List<Long> containerIds, PatternContainerGroup group) {
         if (playerInventorySlot >= 0 && playerInventorySlot <= player.getInventory().getContainerSize()){
             ItemStack carried = player.getInventory().getItem(playerInventorySlot);
             if (carried.isEmpty()) {
                 return;
             }
+            var nothingGroup = PatternContainerGroup.nothing();
             switch (moveConvenience){
-                case NONE: {// do nothing, handled by the client
+                case NONE: {
                     Slot patternSlot = getSlot(playerInventorySlot);
-                    ContainerTracker inv = (ContainerTracker) this.byId.get(containerId);
-                    if (!inv.group.equals(group)){
-                        for(ContainerTracker container : this.byId.values()){
-                            if (container.group.equals(group)){
-                                if (insertPatternToContainer(patternSlot.getItem().copy(), container.server, false)) {
-                                    patternSlot.set(ItemStack.EMPTY);
-                                    return;
-                                }
+                    var ids = new ArrayList<>(mouseButton == 1 ? containerIds.reversed(): containerIds);
+                    for (Long id : ids) {
+                        ContainerTracker inv = this.byId.get(id);
+                        if (!group.equals(nothingGroup) && !inv.group.equals(group)) {
+                            continue;
+                        } else {
+                            if (insertPatternToContainer(patternSlot.getItem().copy(), inv.server, false)) {
+                                patternSlot.set(ItemStack.EMPTY);
+                                return;
                             }
                         }
-                    }else{
-                        if (insertPatternToContainer(patternSlot.getItem().copy(), inv.server, false)) {
-                            patternSlot.set(ItemStack.EMPTY);
-                            return;
-                        }
                     }
+
                     return;
                 }
                 case ONCE_FOR_ALL: {
-//                    if (currentTag.isEmpty()) return;
+                    if (group.equals(nothingGroup)) return;
                     // first check how many blank pattern in player's inventory
                     int blankPatternCount = 0;
                     Map<Integer, Integer> patternCount = new HashMap<>();
@@ -322,14 +320,30 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
                     Slot patternSlot = getSlot(playerInventorySlot);
                     ItemStack itemStack = patternSlot.getItem();
                     // if there are blank patterns, insert the carried item to all container in byId map as many as possible
-                    for (ContainerTracker container : this.byId.values()) {
-                        if (container.group.equals(group)  && insertPatternToContainer(itemStack.copy(), container.server, false)) {
+                    var ids = new ArrayList<>(mouseButton == 1 ? containerIds.reversed(): containerIds);
+                    Set<Long> visitedContainerIds = new HashSet<>();
+                    for (Long id : ids){
+                        ContainerTracker inv = this.byId.get(id);
+                        visitedContainerIds.add(id);
+                        if (inv.group.equals(group) && insertPatternToContainer(itemStack.copy(), inv.server, false)) {
                             insertedCount++;
                             if (insertedCount >= blankPatternCount) {
                                 break; // stop if we have inserted as many as we can
                             }
                         }
                     }
+                    if (insertedCount < blankPatternCount){
+                        for (ContainerTracker container : this.byId.values()) {
+                            if (visitedContainerIds.contains(container.serverId)) continue;
+                            if (container.group.equals(group) && insertPatternToContainer(itemStack.copy(), container.server, false)) {
+                                insertedCount++;
+                                if (insertedCount >= blankPatternCount) {
+                                    break; // stop if we have inserted as many as we can
+                                }
+                            }
+                        }
+                    }
+
                     if (insertedCount >= 0) {
                         // if inserted, remove the carried item from player's inventory
 //                        player.getInventory().setItem(playerInventorySlot, ItemStack.EMPTY);
@@ -354,6 +368,7 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
                     return;
                 }
                 case ONCE_FOR_ALL_STRICT: {
+                    if (group.equals(nothingGroup)) return;
 //                    if (currentTag.isEmpty()) return;
                     // first check how many blank pattern in player's inventory
                     int blankPatternCount = 0;
