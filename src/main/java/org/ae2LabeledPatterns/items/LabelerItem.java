@@ -51,13 +51,24 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
     private final IConfigManager configManager;
 
     public LabelerItem(Properties properties) {
-        super(properties
+        super(properties.stacksTo(1)
                 .component(ComponentRegisters.LABELER_SETTING.value(), new LabelerSetting())
-                .component(ComponentRegisters.MULTI_BLOCK_TARGET.value(), new MultiBlockTarget())
+                .component(ComponentRegisters.MULTI_BLOCK_TARGET.value(), new MultiBlockTarget()
+                )
         );
         this.configManager = IConfigManager.builder(this::onConfigChanged)
                 .registerSetting(MSettings.LABELER_INPUT_LOCKED, YesNo.NO)
                 .build();
+    }
+
+    @Override
+    public boolean hasCraftingRemainingItem(@NotNull ItemStack itemStack) {
+        return itemStack.is(ItemRegisters.LABELER);
+    }
+
+    @Override
+    public @NotNull ItemStack getCraftingRemainingItem(@NotNull ItemStack itemStack) {
+        return itemStack.is(ItemRegisters.LABELER) ? itemStack.copy() : ItemStack.EMPTY;
     }
 
     private void onConfigChanged(IConfigManager manager, Setting<?> setting) {

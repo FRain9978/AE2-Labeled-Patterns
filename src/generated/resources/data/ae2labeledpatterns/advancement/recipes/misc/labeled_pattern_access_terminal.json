@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_labeler": {
+      "conditions": {
+        "items": [
+          {
+            "items": "ae2labeledpatterns:labeler"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "ae2labeledpatterns:labeled_pattern_access_terminal"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_labeler"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "ae2labeledpatterns:labeled_pattern_access_terminal"
+    ]
+  }
+}

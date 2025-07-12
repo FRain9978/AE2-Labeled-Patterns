@@ -3,6 +3,7 @@ package org.ae2LabeledPatterns.data;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.data.BlockTagsProvider;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import org.ae2LabeledPatterns.Ae2LabeledPatterns;
 
@@ -25,5 +26,9 @@ public class DataGeneratorHandler{
                 event.includeClient(),
                 new LanguageProviders.EnglishLanguageProvider(output)
         );
+        generator.addProvider(event.includeServer(), new ModRecipeProvider(output, lookupProvider));
+        var blockTagsProvider = new BlockTagProvider(output, lookupProvider, helper);
+        generator.addProvider(event.includeServer(), blockTagsProvider);
+        generator.addProvider(event.includeServer(), new ItemTagProvider(output, lookupProvider, blockTagsProvider.contentsGetter(), helper));
     }
 }

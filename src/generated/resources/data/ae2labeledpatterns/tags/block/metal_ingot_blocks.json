@@ -1,0 +1,32 @@
+{
+  "values": [
+    {
+      "id": "#c:storage_blocks/copper",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/tin",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/iron",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/gold",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/brass",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/nickel",
+      "required": false
+    },
+    {
+      "id": "#c:storage_blocks/aluminium",
+      "required": false
+    }
+  ]
+}
