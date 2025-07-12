@@ -32,7 +32,7 @@ public class LanguageProviders {
             }
 
             this.addItem(ItemRegisters.LABELER, "标签工具");
-            this.addItem(PartRegisters.LABELED_PATTERN_ACCESS_TERMINAL, "ME标签化样板访问终端");
+            this.addItem(PartRegisters.LABELED_PATTERN_ACCESS_TERMINAL, "ME标签化样板管理终端");
         }
     }
 

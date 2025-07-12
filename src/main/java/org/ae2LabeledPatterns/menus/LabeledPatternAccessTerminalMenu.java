@@ -165,32 +165,29 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
     }
 
     private <T extends PatternContainer> void visitPatternProviderHosts(IGrid grid, Class<T> machineClass, VisitorState state) {
+        allTagTypes.clear();
         for(T container : grid.getActiveMachines(machineClass)) {
             if (this.isVisible(container)) {
                 if (this.getShownProviders() == ShowPatternProviders.NOT_FULL) {
                     this.pinnedHosts.add(container);
                 }
-                if (container instanceof PatternProviderLogicHost) {
+                if (currentTag == null || currentTag.isEmpty()){
+                    var entity = ((PatternProviderLogicHost) container).getBlockEntity();
+                    var tagData = entity != null ? entity.getData(AttachmentRegisters.PATTERN_PROVIDER_LABEL) : null;
+                    if (tagData != null && !tagData.isEmpty()){
+                        allTagTypes.add(tagData);
+                    }
+                    ContainerTracker t = (ContainerTracker) this.diList.get(container);
+                    if (t == null || !t.group.equals(container.getTerminalGroup())) {
+                        state.forceFullUpdate = true;
+                    }
+                    ++state.total;
+                }else if (container instanceof PatternProviderLogicHost) {
                     var entity = ((PatternProviderLogicHost) container).getBlockEntity();
                     var tagData = entity != null ? entity.getData(AttachmentRegisters.PATTERN_PROVIDER_LABEL) : null;
                     if (tagData != null && !tagData.isEmpty()) {
-                        if (currentTag != null && !currentTag.isEmpty()){
-                            if (tagData.equals(currentTag)) {
-                                ContainerTracker t = (ContainerTracker) this.diList.get(container);
-                                if (t == null || !t.group.equals(container.getTerminalGroup())) {
-                                    state.forceFullUpdate = true;
-                                }
-                                ++state.total;
-                            }
-                        }else{
-                            ContainerTracker t = (ContainerTracker) this.diList.get(container);
-                            if (t == null || !t.group.equals(container.getTerminalGroup())) {
-                                state.forceFullUpdate = true;
-                            }
-                            ++state.total;
-                        }
-                    } else{
-                        if (currentTag == null || currentTag.isEmpty()){
+                        allTagTypes.add(tagData);
+                        if (tagData.equals(currentTag)){
                             ContainerTracker t = (ContainerTracker) this.diList.get(container);
                             if (t == null || !t.group.equals(container.getTerminalGroup())) {
                                 state.forceFullUpdate = true;
@@ -199,6 +196,7 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
                         }
                     }
                 }
+
             }
         }
 
@@ -292,7 +290,7 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
                     var ids = new ArrayList<>(mouseButton == 1 ? containerIds.reversed(): containerIds);
                     for (Long id : ids) {
                         ContainerTracker inv = this.byId.get(id);
-                        if (!group.equals(nothingGroup) && !inv.group.equals(group)) {
+                        if (!isVisible(inv.container) || (!group.equals(nothingGroup) && !inv.group.equals(group))) {
                             continue;
                         } else {
                             if (insertPatternToContainer(patternSlot.getItem().copy(), inv.server, false)) {
@@ -325,7 +323,7 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
                     for (Long id : ids){
                         ContainerTracker inv = this.byId.get(id);
                         visitedContainerIds.add(id);
-                        if (inv.group.equals(group) && insertPatternToContainer(itemStack.copy(), inv.server, false)) {
+                        if (isVisible(inv.container) && inv.group.equals(group) && insertPatternToContainer(itemStack.copy(), inv.server, false)) {
                             insertedCount++;
                             if (insertedCount >= blankPatternCount) {
                                 break; // stop if we have inserted as many as we can
@@ -333,9 +331,9 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
                         }
                     }
                     if (insertedCount < blankPatternCount){
-                        for (ContainerTracker container : this.byId.values()) {
-                            if (visitedContainerIds.contains(container.serverId)) continue;
-                            if (container.group.equals(group) && insertPatternToContainer(itemStack.copy(), container.server, false)) {
+                        for (ContainerTracker containerTracker : this.byId.values()) {
+                            if (visitedContainerIds.contains(containerTracker.serverId)) continue;
+                            if (isVisible(containerTracker.container) && containerTracker.group.equals(group) && insertPatternToContainer(itemStack.copy(), containerTracker.server, false)) {
                                 insertedCount++;
                                 if (insertedCount >= blankPatternCount) {
                                     break; // stop if we have inserted as many as we can
@@ -385,9 +383,9 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
                     ItemStack itemStack = patternSlot.getItem();
                     // if there are blank patterns, insert the carried item to all container in byId map as many as possible
                     Set<ContainerTracker> containerTrackers = new HashSet<>();
-                    for (ContainerTracker container : this.byId.values()) {
-                        if (container.group.equals(group) && insertPatternToContainer(itemStack.copy(), container.server, true)) {
-                            containerTrackers.add(container);
+                    for (ContainerTracker containerTracker : this.byId.values()) {
+                        if (isVisible(containerTracker.container) && containerTracker.group.equals(group) && insertPatternToContainer(itemStack.copy(), containerTracker.server, true)) {
+                            containerTrackers.add(containerTracker);
                             insertedCount++;
                             if (insertedCount > blankPatternCount) {
                                 // strict mode return directly
@@ -440,7 +438,6 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
     private void sendFullUpdate(@Nullable IGrid grid) {
         this.byId.clear();
         this.diList.clear();
-        this.allTagTypes.clear();
         this.sendPacketToClient(new ClearLabeledPatternAccessTerminalPacket());
         if (grid != null) {
             for(Class<?> machineClass : grid.getMachineClasses()) {
@@ -449,20 +446,13 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
                     for(PatternContainer container : grid.getActiveMachines(containerClass)) {
                         if (this.isVisible(container)) {
 //                            this.diList.put(container, new ContainerTracker(container, container.getTerminalPatternInventory(), container.getTerminalGroup()));
-                            if (container instanceof PatternProviderLogicHost) {
+                            if (currentTag == null || currentTag.isEmpty()){
+                                this.diList.put(container, new ContainerTracker(container, container.getTerminalPatternInventory(), container.getTerminalGroup()));
+                            } else if (container instanceof PatternProviderLogicHost) {
                                 var entity = ((PatternProviderLogicHost) container).getBlockEntity();
                                 var tagData = entity != null ? entity.getData(AttachmentRegisters.PATTERN_PROVIDER_LABEL) : null;
                                 if (tagData != null && !tagData.isEmpty()) {
-                                    allTagTypes.add(tagData);
-                                    if (currentTag != null && !currentTag.isEmpty()){
-                                        if (tagData.equals(currentTag)) {
-                                            this.diList.put(container, new ContainerTracker(container, container.getTerminalPatternInventory(), container.getTerminalGroup()));
-                                        }
-                                    }else{
-                                        this.diList.put(container, new ContainerTracker(container, container.getTerminalPatternInventory(), container.getTerminalGroup()));
-                                    }
-                                }else{
-                                    if (currentTag == null || currentTag.isEmpty()){
+                                    if (tagData.equals(currentTag)) {
                                         this.diList.put(container, new ContainerTracker(container, container.getTerminalPatternInventory(), container.getTerminalGroup()));
                                     }
                                 }

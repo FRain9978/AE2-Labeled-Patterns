@@ -28,7 +28,7 @@ public class LabeledPatternAccessTerminalPart extends AbstractDisplayPart implem
     @PartModels
     public static final ResourceLocation MODEL_OFF = Ae2LabeledPatterns.makeId("part/labeled_pattern_access_terminal_off");
     @PartModels
-    public static final ResourceLocation MODEL_ON = Ae2LabeledPatterns.makeId("part/labeled_pattern_access_terminal_off");
+    public static final ResourceLocation MODEL_ON = Ae2LabeledPatterns.makeId("part/labeled_pattern_access_terminal_on");
     public static final IPartModel MODELS_OFF;
     public static final IPartModel MODELS_ON;
     public static final IPartModel MODELS_HAS_CHANNEL;

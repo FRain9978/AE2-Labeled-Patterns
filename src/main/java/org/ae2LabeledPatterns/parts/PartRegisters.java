@@ -34,7 +34,8 @@ public class PartRegisters {
             registerPart("labeled_pattern_access_terminal", LabeledPatternAccessTerminalPart.class, LabeledPatternAccessTerminalPart::new);
 
     private static <T extends IPart> DeferredItem<Item> registerPart(String name, Class<T> partClass, Function<IPartItem<T>, T> factory){
-        models.addAll(PartModelsHelper.createModels(partClass));
+//        models.addAll(PartModelsHelper.createModels(partClass));
+        PartModels.registerModels(PartModelsHelper.createModels(partClass));
         DeferredItem<Item> partItem = PARTS.registerItem(name, (props) -> new PartItem<>(props, partClass, factory));
         parts.add(partItem);
         return partItem;
@@ -45,7 +46,7 @@ public class PartRegisters {
     }
 
     public static void registerModels(){
-        PartModels.registerModels(models);
+//        PartModels.registerModels(models);
     }
 
     private static ResourceLocation id(String id) {
