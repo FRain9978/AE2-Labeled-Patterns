@@ -4,6 +4,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 import org.ae2LabeledPatterns.Ae2LabeledPatterns;
+import org.ae2LabeledPatterns.Ae2LabeledPatternsClient;
 import org.ae2LabeledPatterns.integration.tooltips.InGameTooltip;
 import org.ae2LabeledPatterns.integration.tooltips.TooltipProviders;
 import org.ae2LabeledPatterns.items.ItemRegisters;
@@ -20,9 +21,9 @@ public class LanguageProviders {
         @Override
         protected void addTranslations() {
             this.add("creativetab.ae2labeledpatterns.main", "AE2标签化样板");
-            this.add(Ae2LabeledPatterns.ClientModEvents.KEYBINDING_MOD_CATEGORY, "AE2标签化样板");
-            this.add(Ae2LabeledPatterns.ClientModEvents.KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_1_DESCRIPTION, "鼠标滚轮物品修饰键1");
-            this.add(Ae2LabeledPatterns.ClientModEvents.KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_2_DESCRIPTION, "鼠标滚轮物品修饰键2");
+            this.add(Ae2LabeledPatternsClient.KEYBINDING_MOD_CATEGORY, "AE2标签化样板");
+            this.add(Ae2LabeledPatternsClient.KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_1_DESCRIPTION, "鼠标滚轮物品修饰键1");
+            this.add(Ae2LabeledPatternsClient.KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_2_DESCRIPTION, "鼠标滚轮物品修饰键2");
 
             for (var gui: GUIText.values()){
                 this.add(gui.getTranslationKey(), gui.getChineseText());
@@ -45,9 +46,9 @@ public class LanguageProviders {
         @Override
         protected void addTranslations() {
             this.add("creativetab.ae2labeledpatterns.main", "AE2 Labeled Patterns");
-            this.add(Ae2LabeledPatterns.ClientModEvents.KEYBINDING_MOD_CATEGORY, "AE2 Labeled Patterns");
-            this.add(Ae2LabeledPatterns.ClientModEvents.KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_1_DESCRIPTION, "Modifier 1 for Mouse-Wheel Items");
-            this.add(Ae2LabeledPatterns.ClientModEvents.KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_2_DESCRIPTION, "Modifier 2 for Mouse-Wheel Items");
+            this.add(Ae2LabeledPatternsClient.KEYBINDING_MOD_CATEGORY, "AE2 Labeled Patterns");
+            this.add(Ae2LabeledPatternsClient.KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_1_DESCRIPTION, "Modifier 1 for Mouse-Wheel Items");
+            this.add(Ae2LabeledPatternsClient.KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_2_DESCRIPTION, "Modifier 2 for Mouse-Wheel Items");
 
             for (var gui: GUIText.values()){
                 this.add(gui.getTranslationKey(), gui.getEnglishText());
