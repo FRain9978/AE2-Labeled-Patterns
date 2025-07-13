@@ -180,6 +180,7 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
                 }else if (CheckProvider.isEntityProvider(container)) {
                     var tagData = CheckProvider.getEntityProviderLabel(container);
                     if (!tagData.isEmpty()) {
+                        allTagTypes.add(tagData);
                         if (tagData.equals(currentTag)){
                             ContainerTracker t = (ContainerTracker) this.diList.get(container);
                             if (t == null || !t.group.equals(container.getTerminalGroup())) {
