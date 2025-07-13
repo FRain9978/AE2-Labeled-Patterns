@@ -6,7 +6,7 @@ navigation:
 ---
 
 # AE2 Labeled Patterns
-// TODO: Add a screenshot of the mod in action
+![title icon](labeler_titleimg_lit.png)
 ## About
 A simple mod adds the ability to label pattern providers in Applied Energistics 2, allowing you to organize your patterns in new pattern access terminal.
 ## Features

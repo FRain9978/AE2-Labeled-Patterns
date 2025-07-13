@@ -31,7 +31,7 @@ public enum GUIText implements LocalizationEnum {
             "试图将相同的样板插入到的每一个样板供应器中，需要空白样板。"),
     MoveConvenienceButtonForAllStrict("Strictly insert pattern to providers. Only work with enough blank patterns.",
             "严格地将样板插入供应器中。在有足够的空白样板才起效。"),
-    ShowGroupSelectRatioTitle("Group Selection Check box", "组选择按钮"),
+    ShowGroupSelectRatioTitle("Group Selection", "组选择"),
     ShowGroupSelectRatioYes("Check box is shown", "按钮显示"),
     ShowGroupSelectRatioNo("Check box is hidden", "按钮隐藏"),
     ;
