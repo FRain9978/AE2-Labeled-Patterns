@@ -165,18 +165,12 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
     }
 
     private <T extends PatternContainer> void visitPatternProviderHosts(IGrid grid, Class<T> machineClass, VisitorState state) {
-        allTagTypes.clear();
         for(T container : grid.getActiveMachines(machineClass)) {
             if (this.isVisible(container)) {
                 if (this.getShownProviders() == ShowPatternProviders.NOT_FULL) {
                     this.pinnedHosts.add(container);
                 }
                 if (currentTag == null || currentTag.isEmpty()){
-                    var entity = ((PatternProviderLogicHost) container).getBlockEntity();
-                    var tagData = entity != null ? entity.getData(AttachmentRegisters.PATTERN_PROVIDER_LABEL) : null;
-                    if (tagData != null && !tagData.isEmpty()){
-                        allTagTypes.add(tagData);
-                    }
                     ContainerTracker t = (ContainerTracker) this.diList.get(container);
                     if (t == null || !t.group.equals(container.getTerminalGroup())) {
                         state.forceFullUpdate = true;
@@ -186,7 +180,6 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
                     var entity = ((PatternProviderLogicHost) container).getBlockEntity();
                     var tagData = entity != null ? entity.getData(AttachmentRegisters.PATTERN_PROVIDER_LABEL) : null;
                     if (tagData != null && !tagData.isEmpty()) {
-                        allTagTypes.add(tagData);
                         if (tagData.equals(currentTag)){
                             ContainerTracker t = (ContainerTracker) this.diList.get(container);
                             if (t == null || !t.group.equals(container.getTerminalGroup())) {
@@ -438,6 +431,7 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
     private void sendFullUpdate(@Nullable IGrid grid) {
         this.byId.clear();
         this.diList.clear();
+        allTagTypes.clear();
         this.sendPacketToClient(new ClearLabeledPatternAccessTerminalPacket());
         if (grid != null) {
             for(Class<?> machineClass : grid.getMachineClasses()) {
@@ -447,11 +441,19 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
                         if (this.isVisible(container)) {
 //                            this.diList.put(container, new ContainerTracker(container, container.getTerminalPatternInventory(), container.getTerminalGroup()));
                             if (currentTag == null || currentTag.isEmpty()){
+                                if (container instanceof PatternProviderLogicHost logicHost){
+                                    var entity = logicHost.getBlockEntity();
+                                    var tagData = entity != null ? entity.getData(AttachmentRegisters.PATTERN_PROVIDER_LABEL) : null;
+                                    if (tagData != null && !tagData.isEmpty()){
+                                        allTagTypes.add(tagData);
+                                    }
+                                }
                                 this.diList.put(container, new ContainerTracker(container, container.getTerminalPatternInventory(), container.getTerminalGroup()));
                             } else if (container instanceof PatternProviderLogicHost) {
                                 var entity = ((PatternProviderLogicHost) container).getBlockEntity();
                                 var tagData = entity != null ? entity.getData(AttachmentRegisters.PATTERN_PROVIDER_LABEL) : null;
                                 if (tagData != null && !tagData.isEmpty()) {
+                                    allTagTypes.add(tagData);
                                     if (tagData.equals(currentTag)) {
                                         this.diList.put(container, new ContainerTracker(container, container.getTerminalPatternInventory(), container.getTerminalGroup()));
                                     }
