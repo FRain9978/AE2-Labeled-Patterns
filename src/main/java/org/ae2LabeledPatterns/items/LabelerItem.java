@@ -30,6 +30,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.ae2LabeledPatterns.config.Config;
 import org.ae2LabeledPatterns.config.MSettings;
 import org.ae2LabeledPatterns.attachments.AttachmentRegisters;
+import org.ae2LabeledPatterns.integration.CheckProvider;
 import org.ae2LabeledPatterns.integration.tooltips.InGameTooltip;
 import org.ae2LabeledPatterns.items.components.*;
 import org.ae2LabeledPatterns.menus.LabelerMenu;
@@ -110,7 +111,7 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
             switch (setting.mode()){
                 case LabelerMode.SINGLE_SET:{
                     if (blockEntity == null) return InteractionResult.PASS;
-                    if (blockEntity instanceof PatternProviderLogicHost){
+                    if (CheckProvider.isEntityProvider(blockEntity)){
                         if (level.isClientSide){
                             return InteractionResult.sidedSuccess(true);
                         }
@@ -127,7 +128,7 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                 }
                 case LabelerMode.SINGLE_CLEAR:{
                     if (blockEntity == null) return InteractionResult.PASS;
-                    if (blockEntity instanceof PatternProviderLogicHost) {
+                    if (CheckProvider.isEntityProvider(blockEntity)) {
                         if (level.isClientSide) {
                             return InteractionResult.sidedSuccess(true);
                         }
@@ -216,7 +217,7 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                         return InteractionResult.sidedSuccess(true);
                     }
                     if (player.isCrouching()){
-                        PatternProviderLabel data = blockEntity.getData(AttachmentRegisters.PATTERN_PROVIDER_LABEL);
+                        PatternProviderLabel data = CheckProvider.getEntityProviderLabel(blockEntity);
                         if (!data.isEmpty()) {
                             var savedLabels = itemStack.get(SAVED_LABELS.get());
                             if (savedLabels != null) {
@@ -225,7 +226,7 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                                     newSavedLabels.add(data);
                                     itemStack.set(SAVED_LABELS.get(), newSavedLabels);
                                 }
-                            }else{
+                            } else {
                                 itemStack.set(SAVED_LABELS.get(), List.of(data));
                             }
                             itemStack.set(PATTERN_PROVIDER_LABEL.get(), data);
@@ -259,7 +260,7 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
             for (int y = Math.min(p1.getY(), p2.getY()); y <= Math.max(p1.getY(), p2.getY()); y++) {
                 for (int z = Math.min(p1.getZ(), p2.getZ()); z <= Math.max(p1.getZ(), p2.getZ()); z++) {
                     BlockEntity be = level.getBlockEntity(new BlockPos(x, y, z));
-                    if (be instanceof PatternProviderLogicHost) {
+                    if (CheckProvider.isEntityProvider(be)) {
                         setProviderLabel(serverPlayer, be, label, showMessage);
                     }
                 }
@@ -281,7 +282,7 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
             for (int y = Math.min(p1.getY(), p2.getY()); y <= Math.max(p1.getY(), p2.getY()); y++) {
                 for (int z = Math.min(p1.getZ(), p2.getZ()); z <= Math.max(p1.getZ(), p2.getZ()); z++) {
                     BlockEntity be = level.getBlockEntity(new BlockPos(x, y, z));
-                    if (be instanceof PatternProviderLogicHost) {
+                    if (CheckProvider.isEntityProvider(be)) {
                         clearProviderLabel(serverPlayer, be, showMessage);
                     }
                 }

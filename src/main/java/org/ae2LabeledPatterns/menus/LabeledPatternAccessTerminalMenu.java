@@ -35,6 +35,7 @@ import net.minecraft.world.item.ItemStack;
 import org.ae2LabeledPatterns.Ae2LabeledPatterns;
 import org.ae2LabeledPatterns.config.MSettings;
 import org.ae2LabeledPatterns.attachments.AttachmentRegisters;
+import org.ae2LabeledPatterns.integration.CheckProvider;
 import org.ae2LabeledPatterns.items.components.PatternProviderLabel;
 import org.ae2LabeledPatterns.network.LabeledPatternAccessTerminalPacket;
 import org.ae2LabeledPatterns.network.ClearLabeledPatternAccessTerminalPacket;
@@ -176,10 +177,9 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
                         state.forceFullUpdate = true;
                     }
                     ++state.total;
-                }else if (container instanceof PatternProviderLogicHost) {
-                    var entity = ((PatternProviderLogicHost) container).getBlockEntity();
-                    var tagData = entity != null ? entity.getData(AttachmentRegisters.PATTERN_PROVIDER_LABEL) : null;
-                    if (tagData != null && !tagData.isEmpty()) {
+                }else if (CheckProvider.isEntityProvider(container)) {
+                    var tagData = CheckProvider.getEntityProviderLabel(container);
+                    if (!tagData.isEmpty()) {
                         if (tagData.equals(currentTag)){
                             ContainerTracker t = (ContainerTracker) this.diList.get(container);
                             if (t == null || !t.group.equals(container.getTerminalGroup())) {
@@ -441,18 +441,16 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
                         if (this.isVisible(container)) {
 //                            this.diList.put(container, new ContainerTracker(container, container.getTerminalPatternInventory(), container.getTerminalGroup()));
                             if (currentTag == null || currentTag.isEmpty()){
-                                if (container instanceof PatternProviderLogicHost logicHost){
-                                    var entity = logicHost.getBlockEntity();
-                                    var tagData = entity != null ? entity.getData(AttachmentRegisters.PATTERN_PROVIDER_LABEL) : null;
-                                    if (tagData != null && !tagData.isEmpty()){
+                                if (CheckProvider.isEntityProvider(container)){
+                                    var tagData = CheckProvider.getEntityProviderLabel(container);
+                                    if (!tagData.isEmpty()){
                                         allTagTypes.add(tagData);
                                     }
                                 }
                                 this.diList.put(container, new ContainerTracker(container, container.getTerminalPatternInventory(), container.getTerminalGroup()));
-                            } else if (container instanceof PatternProviderLogicHost) {
-                                var entity = ((PatternProviderLogicHost) container).getBlockEntity();
-                                var tagData = entity != null ? entity.getData(AttachmentRegisters.PATTERN_PROVIDER_LABEL) : null;
-                                if (tagData != null && !tagData.isEmpty()) {
+                            } else if (CheckProvider.isEntityProvider(container)) {
+                                var tagData = CheckProvider.getEntityProviderLabel(container);
+                                if (!tagData.isEmpty()) {
                                     allTagTypes.add(tagData);
                                     if (tagData.equals(currentTag)) {
                                         this.diList.put(container, new ContainerTracker(container, container.getTerminalPatternInventory(), container.getTerminalGroup()));
@@ -519,8 +517,6 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
     }
 
     public void cycleTag(boolean isRightClick){
-        LogUtils.getLogger().debug("cycleTag:\ncurrent: {}\nallTagTypes: {}\nisRightClick: {}", currentTag, allTagTypes, isRightClick);
-        LogUtils.getLogger().debug("idList: {}", diList.keySet());
         if (isClientSide()){
             sendClientAction(ACTION_CYCLE_TAG, isRightClick);
             return;

@@ -116,6 +116,8 @@ dependencies {
     // compileOnly "org.appliedenergistics:appliedenergistics2:19.2.4:api"
     implementation "org.appliedenergistics:appliedenergistics2:19.2.4"
     implementation "org.appliedenergistics:guideme:21.1.1"
+    compileOnly "curse.maven:advancedae-1084104:6225993"
+//    localRuntimeOnly "curse.maven:advancedae-1084104:6225993"
     localRuntimeOnly "dev.emi:emi-neoforge:${emi_version}"
     localRuntimeOnly "curse.maven:jade-324717:${jade_id}"
     // Example mod dependency with JEI
