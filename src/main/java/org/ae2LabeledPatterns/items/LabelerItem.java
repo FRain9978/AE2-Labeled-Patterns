@@ -103,13 +103,13 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
         BlockEntity blockEntity = level.getBlockEntity(context.getClickedPos());
         Player player = context.getPlayer();
         if (player == null) return InteractionResult.PASS;
-        if (blockEntity == null) return InteractionResult.PASS;
         ItemStack itemStack = context.getItemInHand();
         if (itemStack.getItem() instanceof LabelerItem){
             var setting = itemStack.get(LABELER_SETTING.get());
             if (setting == null) return InteractionResult.PASS;
             switch (setting.mode()){
                 case LabelerMode.SINGLE_SET:{
+                    if (blockEntity == null) return InteractionResult.PASS;
                     if (blockEntity instanceof PatternProviderLogicHost){
                         if (level.isClientSide){
                             return InteractionResult.sidedSuccess(true);
@@ -126,6 +126,7 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                     }
                 }
                 case LabelerMode.SINGLE_CLEAR:{
+                    if (blockEntity == null) return InteractionResult.PASS;
                     if (blockEntity instanceof PatternProviderLogicHost) {
                         if (level.isClientSide) {
                             return InteractionResult.sidedSuccess(true);
@@ -200,7 +201,7 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                         }
                         ServerPlayer serverPlayer = (ServerPlayer) player;
                         // get all the blockEntity between the points
-                        areaClearProviderLabel(p1, p2, level, serverPlayer, blockEntity, false);
+                        areaClearProviderLabel(p1, p2, level, serverPlayer, false);
                         // clear the currentPosTarget
                         itemStack.set(ComponentRegisters.MULTI_BLOCK_TARGET.get(), currentPosTarget.clear());
                         player.sendSystemMessage(InGameTooltip.LabelerAreaClearProviderLabel.text());
@@ -275,7 +276,7 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                 new SaveLabelAttachmentPacket(new PatternProviderLabel(), blockEntity.getBlockPos()));
     }
 
-    private void areaClearProviderLabel(BlockPos p1, BlockPos p2, Level level, ServerPlayer serverPlayer, BlockEntity blockEntity, boolean showMessage) {
+    private void areaClearProviderLabel(BlockPos p1, BlockPos p2, Level level, ServerPlayer serverPlayer, boolean showMessage) {
         for (int x = Math.min(p1.getX(), p2.getX()); x <= Math.max(p1.getX(), p2.getX()); x++) {
             for (int y = Math.min(p1.getY(), p2.getY()); y <= Math.max(p1.getY(), p2.getY()); y++) {
                 for (int z = Math.min(p1.getZ(), p2.getZ()); z <= Math.max(p1.getZ(), p2.getZ()); z++) {
