@@ -7,7 +7,6 @@ import appeng.api.implementations.menuobjects.ItemMenuHost;
 import appeng.api.storage.ISubMenuHost;
 import appeng.api.util.IConfigManager;
 import appeng.api.util.IConfigurableObject;
-import appeng.helpers.patternprovider.PatternProviderLogicHost;
 import appeng.menu.ISubMenu;
 import appeng.menu.MenuOpener;
 import appeng.menu.locator.ItemMenuHostLocator;
@@ -164,7 +163,7 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                             return InteractionResult.sidedSuccess(false);
                         }
                         ServerPlayer serverPlayer = (ServerPlayer) player;
-                        var label = itemStack.getComponents().get(ComponentRegisters.PATTERN_PROVIDER_LABEL.get());
+                        var label = itemStack.get(ComponentRegisters.PATTERN_PROVIDER_LABEL.get());
                         // get all the blockEntity between the points
                         areaSetProviderLabel(p1, p2, level, serverPlayer, label, false);
                         // clear the currentPosTarget
@@ -304,7 +303,7 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
 
     @Override
     public @Nullable ItemMenuHost<?> getMenuHost(Player player, ItemMenuHostLocator locator, @Nullable BlockHitResult hitResult) {
-        return new TaggerItemMenuHost(this, player, locator);
+        return new LabelerItemMenuHost(this, player, locator);
     }
 
     @Override
@@ -338,9 +337,9 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
 
     }
 
-    public class TaggerItemMenuHost extends ItemMenuHost<LabelerItem> implements ISubMenuHost{
+    public class LabelerItemMenuHost extends ItemMenuHost<LabelerItem> implements ISubMenuHost{
 
-        public TaggerItemMenuHost(LabelerItem item, Player player, ItemMenuHostLocator locator) {
+        public LabelerItemMenuHost(LabelerItem item, Player player, ItemMenuHostLocator locator) {
             super(item, player, locator);
         }
 

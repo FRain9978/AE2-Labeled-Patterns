@@ -8,6 +8,7 @@
   "gui.ae2labeledpatterns.labelereditlockhint": "锁定输入框以防止编辑",
   "gui.ae2labeledpatterns.labelereditsave": "保存",
   "gui.ae2labeledpatterns.labelerinputplaceholder": "请输入标签名称",
+  "gui.ae2labeledpatterns.labeleropenlist": "打开标签列表",
   "gui.ae2labeledpatterns.labelertitle": "标签工具",
   "gui.ae2labeledpatterns.labellistdelete": "删除",
   "gui.ae2labeledpatterns.labellistselect": "选择",

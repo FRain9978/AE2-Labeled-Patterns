@@ -45,7 +45,7 @@ public class Ae2LabeledPatterns {
     // Define mod id in a common place for everything to reference
     public static final String MODID = "ae2labeledpatterns";
     // Directly reference a slf4j logger
-    private static final Logger LOGGER = LogUtils.getLogger();
+//    private static final Logger LOGGER = LogUtils.getLogger();
     // Create a Deferred Register to hold Blocks which will all be registered under the "ae2patterntagger" namespace
 //    public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(MODID);
     // Create a Deferred Register to hold Items which will all be registered under the "ae2patterntagger" namespace
@@ -99,7 +99,7 @@ public class Ae2LabeledPatterns {
         // Register ourselves for server and other game events we are interested in.
         // Note that this is necessary if and only if we want *this* class (Ae2LabeledPatterns) to respond directly to events.
         // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
-        NeoForge.EVENT_BUS.register(this);
+//        NeoForge.EVENT_BUS.register(this);
 
         // Register the item to a creative tab
 //        modEventBus.addListener(this::addCreative);
@@ -128,10 +128,10 @@ public class Ae2LabeledPatterns {
 //        if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) event.accept(EXAMPLE_BLOCK_ITEM);
 //    }
 
-    // You can use SubscribeEvent and let the Event Bus discover methods to call
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
-        // Do something when the server starts
-        LOGGER.info("HELLO from server starting");
-    }
+//    // You can use SubscribeEvent and let the Event Bus discover methods to call
+//    @SubscribeEvent
+//    public void onServerStarting(ServerStartingEvent event) {
+//        // Do something when the server starts
+//        LOGGER.info("HELLO from server starting");
+//    }
 }

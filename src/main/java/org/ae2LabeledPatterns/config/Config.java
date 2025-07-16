@@ -16,7 +16,7 @@ public class Config {
 
 //    private static final ModConfigSpec.BooleanValue LOG_DIRT_BLOCK = BUILDER.comment("Whether to log the dirt block on common setup").define("logDirtBlock", true);
 
-    private static final ModConfigSpec.IntValue MAX_ALLOW_BLOCK_SPACE = BUILDER.comment("Max allow block space for labeler").defineInRange("maxAllowBlockSpace", 64, 0, Integer.MAX_VALUE);
+    private static final ModConfigSpec.IntValue MAX_ALLOW_BLOCK_SPACE = BUILDER.comment("Max allow block space for labeler").defineInRange("maxAllowBlockSpace", 128, 0, Integer.MAX_VALUE);
 
 //    public static final ModConfigSpec.ConfigValue<String> MAGIC_NUMBER_INTRODUCTION = BUILDER.comment("What you want the introduction message to be for the magic number").define("magicNumberIntroduction", "The magic number is... ");
 

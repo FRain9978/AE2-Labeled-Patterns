@@ -1,6 +1,7 @@
 package org.ae2LabeledPatterns.integration;
 
 import appeng.helpers.patternprovider.PatternProviderLogicHost;
+import com.glodblock.github.extendedae.common.tileentities.matrix.TileAssemblerMatrixPattern;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.pedroksl.advanced_ae.common.logic.AdvPatternProviderLogicHost;
 import org.ae2LabeledPatterns.attachments.AttachmentRegisters;
@@ -12,7 +13,9 @@ public class CheckProvider {
         try {
             return (object instanceof BlockEntity blockEntity) &&
                     (isBasicProvider(blockEntity) != null ||
-                            isAAEProvider(blockEntity) != null);
+                            isAAEProvider(blockEntity) != null ||
+                            isEAEAssemblerMatrixProvider(blockEntity) != null
+                    );
         } catch (Throwable ignored) {
             return false;
         }
@@ -36,6 +39,14 @@ public class CheckProvider {
     private static AdvPatternProviderLogicHost isAAEProvider(BlockEntity blockEntity) {
         try {
             return blockEntity instanceof AdvPatternProviderLogicHost advPatternProviderLogicHost? advPatternProviderLogicHost : null;
+        } catch (Throwable ignored) {
+            return null;
+        }
+    }
+
+    private static TileAssemblerMatrixPattern isEAEAssemblerMatrixProvider(BlockEntity blockEntity) {
+        try {
+            return blockEntity instanceof TileAssemblerMatrixPattern tileAssemblerMatrixPattern ? tileAssemblerMatrixPattern : null;
         } catch (Throwable ignored) {
             return null;
         }

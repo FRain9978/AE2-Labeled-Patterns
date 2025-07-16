@@ -543,7 +543,12 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
             setCurrentLabel(nextTag);
         } else {
             if (!allTagTypes.isEmpty()) {
-                setCurrentLabel(allTagTypes.iterator().next());
+                if (!isRightClick){
+                    setCurrentLabel(allTagTypes.iterator().next());
+                }else {
+                    List<PatternProviderLabel> tags = new ArrayList<>(allTagTypes);
+                    setCurrentLabel(tags.getLast());
+                }
             }
         }
     }

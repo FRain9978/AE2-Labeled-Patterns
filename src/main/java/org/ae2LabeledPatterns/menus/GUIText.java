@@ -13,6 +13,7 @@ public enum GUIText implements LocalizationEnum {
     LabelerEditSave("Save", "保存"),
     LabelerEditLock("Lock Edit", "输入锁定"),
     LabelerEditLockHint("Block the input field for editing", "锁定输入框以防止编辑"),
+    LabelerOpenList("Open Label List", "打开标签列表"),
     LabelListTitle("Saved Labels", "保存的标签"),
     LabelListSelect("Select", "选择"),
     LabelListDelete("Delete", "删除"),

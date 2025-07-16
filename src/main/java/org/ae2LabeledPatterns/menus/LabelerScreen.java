@@ -55,7 +55,7 @@ public class LabelerScreen extends AEBaseScreen<LabelerMenu> {
 
         var host = this.menu.getHost();
         if (host instanceof ISubMenuHost){
-            addToLeftToolbar(LabelListButton.create(this, (ISubMenuHost) host , Component.literal("Open Tag List")));
+            addToLeftToolbar(LabelListButton.create(this, (ISubMenuHost) host , GUIText.LabelerOpenList.text()));
 //            addToLeftToolbar(saveButton);
             widgets.add("save", saveButton);
         }

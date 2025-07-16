@@ -19,6 +19,13 @@ repositories {
             includeGroup "curse.maven"
         }
     }
+    maven {
+        name = 'GeckoLib'
+        url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+        content {
+            includeGroup("software.bernie.geckolib")
+        }
+    }
     mavenCentral()
 }
 
@@ -113,11 +120,19 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 
 dependencies {
-    // compileOnly "org.appliedenergistics:appliedenergistics2:19.2.4:api"
-    implementation "org.appliedenergistics:appliedenergistics2:19.2.4"
     implementation "org.appliedenergistics:guideme:21.1.1"
+    implementation "org.appliedenergistics:appliedenergistics2:19.2.4"
+
+    compileOnly "curse.maven:glodium-957920:5614731"
+    localRuntimeOnly "curse.maven:glodium-957920:5614731"
+    compileOnly "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:4.7"
+    localRuntimeOnly "software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:4.7"
+
     compileOnly "curse.maven:advancedae-1084104:6225993"
-//    localRuntimeOnly "curse.maven:advancedae-1084104:6225993"
+    localRuntimeOnly "curse.maven:advancedae-1084104:6225993"
+    compileOnly "curse.maven:ex-pattern-provider-892005:6138925"
+    localRuntimeOnly "curse.maven:ex-pattern-provider-892005:6138925"
+
     localRuntimeOnly "dev.emi:emi-neoforge:${emi_version}"
     localRuntimeOnly "curse.maven:jade-324717:${jade_id}"
     // Example mod dependency with JEI
