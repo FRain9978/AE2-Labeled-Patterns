@@ -5,6 +5,7 @@ navigation:
   parent: ae2lps_intro.md
 item_ids:
   - ae2labeledpatterns:labeled_pattern_access_terminal
+  - ae2labeledpatterns:wireless_labeled_pattern_access_terminal
 ---
 
 # Labeled Pattern Access Terminal
