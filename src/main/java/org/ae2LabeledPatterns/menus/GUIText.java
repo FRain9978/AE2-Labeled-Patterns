@@ -3,7 +3,7 @@ package org.ae2LabeledPatterns.menus;
 import appeng.core.localization.LocalizationEnum;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import org.ae2LabeledPatterns.Ae2LabeledPatterns;
+import org.ae2LabeledPatterns.AE2LabeledPatterns;
 import org.jetbrains.annotations.NotNull;
 
 public enum GUIText implements LocalizationEnum {
@@ -37,7 +37,7 @@ public enum GUIText implements LocalizationEnum {
     ShowGroupSelectRatioNo("Check box is hidden", "按钮隐藏"),
     ;
 
-    private final String root = "gui." + Ae2LabeledPatterns.MODID;
+    private final String root = "gui." + AE2LabeledPatterns.MODID;
 
     @NotNull
     private final String englishText;

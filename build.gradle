@@ -20,6 +20,14 @@ repositories {
         }
     }
     maven {
+        name = "Modmaven"
+        url = uri("https://modmaven.dev/")
+        content {
+            includeGroup("appeng")
+            includeGroup("de.mari_023")
+        }
+    }
+    maven {
         name = 'GeckoLib'
         url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
         content {
@@ -132,6 +140,9 @@ dependencies {
     localRuntimeOnly "curse.maven:advancedae-1084104:6225993"
     compileOnly "curse.maven:ex-pattern-provider-892005:6138925"
     localRuntimeOnly "curse.maven:ex-pattern-provider-892005:6138925"
+
+    jarJar(implementation "de.mari_023:ae2wtlib_api:19.2.0")
+    localRuntimeOnly "de.mari_023:ae2wtlib:19.2.1"
 
     localRuntimeOnly "dev.emi:emi-neoforge:${emi_version}"
     localRuntimeOnly "curse.maven:jade-324717:${jade_id}"

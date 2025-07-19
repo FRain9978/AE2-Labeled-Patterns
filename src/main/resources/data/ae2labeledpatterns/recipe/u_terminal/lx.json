@@ -1,0 +1,17 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "extendedae"
+    }
+  ],
+  "type": "ae2wtlib:combine",
+  "terminalA": {
+    "item": "ae2labeledpatterns:wireless_labeled_pattern_access_terminal"
+  },
+  "terminalB": {
+    "item": "extendedae:wireless_ex_pat"
+  },
+  "terminalAName": "labeled_pattern_access",
+  "terminalBName": "ex_pattern_access"
+}

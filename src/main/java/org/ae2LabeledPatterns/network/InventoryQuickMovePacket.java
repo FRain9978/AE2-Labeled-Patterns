@@ -8,7 +8,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import org.ae2LabeledPatterns.Ae2LabeledPatterns;
+import org.ae2LabeledPatterns.AE2LabeledPatterns;
 import org.ae2LabeledPatterns.menus.LabeledPatternAccessTerminalMenu;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public record InventoryQuickMovePacket(
                     InventoryQuickMovePacket::new
             );
     public static final CustomPacketPayload.Type<InventoryQuickMovePacket> TYPE =
-            new CustomPacketPayload.Type<>(Ae2LabeledPatterns.makeId("inventory_quick_move"));
+            new CustomPacketPayload.Type<>(AE2LabeledPatterns.makeId("inventory_quick_move"));
 
     public CustomPacketPayload.Type<InventoryQuickMovePacket> type() {
         return TYPE;

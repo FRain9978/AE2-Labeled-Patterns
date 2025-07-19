@@ -1,47 +1,32 @@
 package org.ae2LabeledPatterns;
 
 import appeng.api.ids.AECreativeTabIds;
-import appeng.core.network.ServerboundPacket;
-import appeng.helpers.IMouseWheelItem;
-import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.logging.LogUtils;
-import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
-import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.neoforge.client.event.*;
-import net.neoforged.neoforge.client.settings.KeyConflictContext;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.server.ServerStartingEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.fml.loading.LoadingModList;
+import net.neoforged.fml.loading.moddiscovery.ModInfo;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.ae2LabeledPatterns.attachments.AttachmentRegisters;
+import org.ae2LabeledPatterns.capability.CapabilityRegisters;
 import org.ae2LabeledPatterns.config.Config;
-import org.ae2LabeledPatterns.items.IMMouseWheelItem;
+import org.ae2LabeledPatterns.integration.ae2wtlib.AE2wtlibRegisters;
 import org.ae2LabeledPatterns.items.ItemRegisters;
 import org.ae2LabeledPatterns.items.components.ComponentRegisters;
-import org.ae2LabeledPatterns.menus.InitScreens;
 import org.ae2LabeledPatterns.menus.MenuRegisters;
 import org.ae2LabeledPatterns.network.InitNetwork;
-import org.ae2LabeledPatterns.network.MMouseWheelPacket;
 import org.ae2LabeledPatterns.parts.PartRegisters;
-import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/neoforge.mods.toml file
-@Mod(Ae2LabeledPatterns.MODID)
-public class Ae2LabeledPatterns {
+@Mod(AE2LabeledPatterns.MODID)
+public class AE2LabeledPatterns {
     // Define mod id in a common place for everything to reference
     public static final String MODID = "ae2labeledpatterns";
     // Directly reference a slf4j logger
@@ -59,10 +44,10 @@ public class Ae2LabeledPatterns {
 //    public static final DeferredItem<BlockItem> EXAMPLE_BLOCK_ITEM = ITEMS.registerSimpleBlockItem("example_block", EXAMPLE_BLOCK);
 
     // Creates a creative tab with the id "ae2patterntagger:example_tab" for the example item, that is placed after the combat tab
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> CREATIVE_TAB = CREATIVE_MODE_TABS.register("ae2_pattern_tagger", () ->
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> CREATIVE_TAB = CREATIVE_MODE_TABS.register("ae2_labeled_patterns", () ->
             CreativeModeTab.builder()
                     .title(Component.translatable("creativetab.ae2labeledpatterns.main"))
-                    .withTabsBefore(AECreativeTabIds.MAIN).icon(() -> ItemRegisters.LABELER.get().getDefaultInstance())
+                    .withTabsBefore(AECreativeTabIds.FACADES).icon(() -> ItemRegisters.LABELER.get().getDefaultInstance())
                     .displayItems((parameters, output) -> {
                         output.accept(ItemRegisters.LABELER.get());
                         output.accept(PartRegisters.LABELED_PATTERN_ACCESS_TERMINAL.get());
@@ -70,68 +55,31 @@ public class Ae2LabeledPatterns {
 
     // The constructor for the mod class is the first code that is run when your mod is loaded.
     // FML will recognize some parameter types like IEventBus or ModContainer and pass them in automatically.
-    public Ae2LabeledPatterns(IEventBus modEventBus, ModContainer modContainer) {
+    public AE2LabeledPatterns(IEventBus modEventBus, ModContainer modContainer) {
         // Register the commonSetup method for modloading
 //        modEventBus.addListener(this::commonSetup);
 
         ComponentRegisters.COMPONENTS.register(modEventBus);
         AttachmentRegisters.ATTACHMENTS.register(modEventBus);
 
-        // Register the Deferred Register to the mod event bus so blocks get registered
-//        BLOCKS.register(modEventBus);
-
-        // Register the Deferred Register to the mod event bus so items get registered
-//        ITEMS.register(modEventBus);
         ItemRegisters.ITEMS.register(modEventBus);
-
-        MenuRegisters.MENUS.register(modEventBus);
+        if (ModList.get().isLoaded("ae2wtlib")|| LoadingModList.get().getMods()
+                .stream().map(ModInfo::getModId)
+                .anyMatch("ae2wtlib"::equals)) {
+            modEventBus.addListener(AE2wtlibRegisters::Init);
+        }
+        modEventBus.addListener(CapabilityRegisters::Init);
+        PartRegisters.PARTS.register(modEventBus);
 
         modEventBus.addListener(InitNetwork::init);
-
-//        modEventBus.addListener(InitScreens::register);
-//        modEventBus.addListener(PartRegisters::registerModels);
-        PartRegisters.PARTS.register(modEventBus);
-//        PartRegisters.registerModels();
-
-        // Register the Deferred Register to the mod event bus so tabs get registered
+        MenuRegisters.MENUS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
 
-        // Register ourselves for server and other game events we are interested in.
-        // Note that this is necessary if and only if we want *this* class (Ae2LabeledPatterns) to respond directly to events.
-        // Do not add this line if there are no @SubscribeEvent-annotated functions in this class, like onServerStarting() below.
-//        NeoForge.EVENT_BUS.register(this);
-
-        // Register the item to a creative tab
-//        modEventBus.addListener(this::addCreative);
-
-        // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
-
-//    private void commonSetup(final FMLCommonSetupEvent event) {
-//        // Some common setup code
-//        LOGGER.info("HELLO FROM COMMON SETUP");
-//
-//        if (Config.logDirtBlock) LOGGER.info("DIRT BLOCK >> {}", BuiltInRegistries.BLOCK.getKey(Blocks.DIRT));
-//
-//        LOGGER.info(Config.magicNumberIntroduction + Config.magicNumber);
-//
-//        Config.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
-//    }
 
     public static ResourceLocation makeId(String id) {
         return ResourceLocation.fromNamespaceAndPath(MODID, id);
     }
 
-    // Add the example block item to the building blocks tab
-//    private void addCreative(BuildCreativeModeTabContentsEvent event) {
-//        if (event.getTabKey() == CreativeModeTabs.BUILDING_BLOCKS) event.accept(EXAMPLE_BLOCK_ITEM);
-//    }
-
-//    // You can use SubscribeEvent and let the Event Bus discover methods to call
-//    @SubscribeEvent
-//    public void onServerStarting(ServerStartingEvent event) {
-//        // Do something when the server starts
-//        LOGGER.info("HELLO from server starting");
-//    }
 }

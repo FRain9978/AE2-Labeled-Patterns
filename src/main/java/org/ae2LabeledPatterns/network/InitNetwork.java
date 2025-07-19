@@ -7,11 +7,11 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
-import org.ae2LabeledPatterns.Ae2LabeledPatterns;
+import org.ae2LabeledPatterns.AE2LabeledPatterns;
 
 public class InitNetwork {
     public static void init(RegisterPayloadHandlersEvent event) {
-        var registrar = event.registrar(Ae2LabeledPatterns.MODID);
+        var registrar = event.registrar(AE2LabeledPatterns.MODID);
 
         // Clientbound
 

@@ -9,7 +9,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import org.ae2LabeledPatterns.Ae2LabeledPatterns;
+import org.ae2LabeledPatterns.AE2LabeledPatterns;
 import org.ae2LabeledPatterns.menus.LabeledPatternAccessTerminalScreen;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +23,7 @@ public record ClearLabeledPatternAccessTerminalPacket() implements ClientboundPa
                     ClearLabeledPatternAccessTerminalPacket::decode);
 
     public static final Type<ClearLabeledPatternAccessTerminalPacket> TYPE =
-            new CustomPacketPayload.Type<>(Ae2LabeledPatterns.makeId("clear_advanced_pattern_access_terminal"));
+            new CustomPacketPayload.Type<>(AE2LabeledPatterns.makeId("clear_advanced_pattern_access_terminal"));
 
     @Override
     public Type<ClearLabeledPatternAccessTerminalPacket> type() {
@@ -41,7 +41,7 @@ public record ClearLabeledPatternAccessTerminalPacket() implements ClientboundPa
     @OnlyIn(Dist.CLIENT)
     public void handleOnClient(Player player) {
         LoggerFactory.getLogger(this.getClass()).debug("Clearing labeled pattern access terminal data for player: {}", player.getName().getString());
-        if (Minecraft.getInstance().screen instanceof LabeledPatternAccessTerminalScreen patternAccessTerminal) {
+        if (Minecraft.getInstance().screen instanceof LabeledPatternAccessTerminalScreen<?> patternAccessTerminal) {
             patternAccessTerminal.clear();
         }
     }

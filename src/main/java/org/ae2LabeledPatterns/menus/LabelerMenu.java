@@ -7,7 +7,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
-import org.ae2LabeledPatterns.Ae2LabeledPatterns;
+import org.ae2LabeledPatterns.AE2LabeledPatterns;
 import org.ae2LabeledPatterns.items.components.ComponentRegisters;
 import org.ae2LabeledPatterns.items.components.LabelerSetting;
 import org.ae2LabeledPatterns.items.components.PatternProviderLabel;
@@ -20,7 +20,7 @@ public class LabelerMenu extends AEBaseMenu implements ILabelsProvider {
 
     public static final MenuType<LabelerMenu> TYPE = MenuTypeBuilder
             .create(LabelerMenu::new, ItemMenuHost.class)
-            .buildUnregistered(Ae2LabeledPatterns.makeId("labeler"));
+            .buildUnregistered(AE2LabeledPatterns.makeId("labeler"));
 
     private static final String ACTION_SET_LABEL = "setLabel";
     private static final String ACTION_SET_SETTING = "setSetting";

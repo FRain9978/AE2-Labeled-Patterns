@@ -3,7 +3,7 @@ package org.ae2LabeledPatterns.integration.tooltips;
 import appeng.core.localization.LocalizationEnum;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import org.ae2LabeledPatterns.Ae2LabeledPatterns;
+import org.ae2LabeledPatterns.AE2LabeledPatterns;
 import org.jetbrains.annotations.NotNull;
 
 public enum InGameTooltip implements LocalizationEnum {
@@ -29,7 +29,7 @@ public enum InGameTooltip implements LocalizationEnum {
     LabelerAreaClearProviderLabel("Area label cleared", "区域标签已清除"),
     LabelerCopiedLabel("Copied label: %s", "已复制标签: %s"),
     ;
-    private final String root = "waila." + Ae2LabeledPatterns.MODID;
+    private final String root = "waila." + AE2LabeledPatterns.MODID;
 
     @NotNull
     private final String englishText;

@@ -6,13 +6,13 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import org.ae2LabeledPatterns.Ae2LabeledPatterns;
+import org.ae2LabeledPatterns.AE2LabeledPatterns;
 
 import java.util.List;
 
 public class ComponentRegisters {
     public static final DeferredRegister.DataComponents COMPONENTS =
-            DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, Ae2LabeledPatterns.MODID);
+            DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, AE2LabeledPatterns.MODID);
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<PatternProviderLabel>> PATTERN_PROVIDER_LABEL =
             COMPONENTS.registerComponentType(

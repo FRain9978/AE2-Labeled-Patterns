@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class LabeledPatternAccessTerminalScreen extends AEBaseScreen<LabeledPatternAccessTerminalMenu> {
+public class LabeledPatternAccessTerminalScreen<W extends LabeledPatternAccessTerminalMenu> extends AEBaseScreen<W> {
     private static final Logger LOG = LoggerFactory.getLogger(LabeledPatternAccessTerminalScreen.class);
     private static final int GUI_WIDTH = 195;
     private static final int GUI_TOP_AND_BOTTOM_PADDING = 54;
@@ -95,7 +95,7 @@ public class LabeledPatternAccessTerminalScreen extends AEBaseScreen<LabeledPatt
 
     private boolean isShowGroupSelectRatio;
 
-    public LabeledPatternAccessTerminalScreen(LabeledPatternAccessTerminalMenu menu, Inventory playerInventory, Component title, ScreenStyle style) {
+    public LabeledPatternAccessTerminalScreen(W menu, Inventory playerInventory, Component title, ScreenStyle style) {
         super(menu, playerInventory, title, style);
         this.scrollbar = this.widgets.addScrollBar("scrollbar", Scrollbar.BIG);
         this.imageWidth = GUI_WIDTH;

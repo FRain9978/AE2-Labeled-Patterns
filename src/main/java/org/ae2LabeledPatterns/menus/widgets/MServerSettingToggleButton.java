@@ -86,7 +86,7 @@ public class MServerSettingToggleButton<T extends Enum<T>> extends ServerSetting
 
     public MServerSettingToggleButton(Setting<T> setting, T val) {
         super(setting, val);
-        LogUtils.getLogger().debug("MServerSettingToggleButton:{}, val:{}", setting.getName(), val.name());
+//        LogUtils.getLogger().debug("MServerSettingToggleButton:{}, val:{}", setting.getName(), val.name());
 
         if (!isInitialized) {
             initializeAppearances();

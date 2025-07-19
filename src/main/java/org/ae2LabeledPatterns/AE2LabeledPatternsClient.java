@@ -5,8 +5,6 @@ import appeng.api.util.AEColor;
 import appeng.client.render.StaticItemColor;
 import appeng.core.network.ServerboundPacket;
 import appeng.helpers.IMouseWheelItem;
-import appeng.items.parts.ColoredPartItem;
-import appeng.items.parts.PartItem;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -16,23 +14,21 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.ae2LabeledPatterns.items.IMMouseWheelItem;
-import org.ae2LabeledPatterns.menus.InitScreens;
+import org.ae2LabeledPatterns.menus.ScreenRegisters;
 import org.ae2LabeledPatterns.network.MMouseWheelPacket;
 import org.ae2LabeledPatterns.parts.PartRegisters;
 
-@Mod(value = Ae2LabeledPatterns.MODID, dist = Dist.CLIENT)
-public class Ae2LabeledPatternsClient {
-    public static final String KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_1_DESCRIPTION = "key." + Ae2LabeledPatterns.MODID + ".mouse_wheel_item_modifier_1.description";
-    public static final String KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_2_DESCRIPTION = "key." + Ae2LabeledPatterns.MODID + ".mouse_wheel_item_modifier_2.description";
-    public static final String KEYBINDING_MOD_CATEGORY = "key." + Ae2LabeledPatterns.MODID + ".category";
+@Mod(value = AE2LabeledPatterns.MODID, dist = Dist.CLIENT)
+public class AE2LabeledPatternsClient {
+    public static final String KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_1_DESCRIPTION = "key." + AE2LabeledPatterns.MODID + ".mouse_wheel_item_modifier_1.description";
+    public static final String KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_2_DESCRIPTION = "key." + AE2LabeledPatterns.MODID + ".mouse_wheel_item_modifier_2.description";
+    public static final String KEYBINDING_MOD_CATEGORY = "key." + AE2LabeledPatterns.MODID + ".category";
 
     private static final KeyMapping MOUSE_WHEEL_ITEM_MODIFIER_1 = new KeyMapping(
             KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_1_DESCRIPTION, KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM,
@@ -42,7 +38,7 @@ public class Ae2LabeledPatternsClient {
             KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_2_DESCRIPTION, KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM,
             InputConstants.KEY_LALT, KEYBINDING_MOD_CATEGORY);
 
-    public Ae2LabeledPatternsClient(IEventBus modEventBus) {
+    public AE2LabeledPatternsClient(IEventBus modEventBus) {
         modEventBus.addListener(this::registerScreen);
         modEventBus.addListener(this::registerModels);
         modEventBus.addListener(this::registerKeyBinding);
@@ -51,7 +47,7 @@ public class Ae2LabeledPatternsClient {
     }
 
     public void registerScreen(RegisterMenuScreensEvent event){
-        InitScreens.register(event);
+        ScreenRegisters.register(event);
     }
 
     public void registerModels(ModelEvent.RegisterAdditional event){

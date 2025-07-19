@@ -6,12 +6,12 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.registries.DeferredBlock;
-import org.ae2LabeledPatterns.Ae2LabeledPatterns;
+import org.ae2LabeledPatterns.AE2LabeledPatterns;
 import org.ae2LabeledPatterns.parts.PartRegisters;
 
 public class BlockStateProvider extends AE2BlockStateProvider {
     public BlockStateProvider(PackOutput output, ExistingFileHelper exFileHelper) {
-        super(output, Ae2LabeledPatterns.MODID, exFileHelper);
+        super(output, AE2LabeledPatterns.MODID, exFileHelper);
     }
 
     @Override
@@ -30,9 +30,9 @@ public class BlockStateProvider extends AE2BlockStateProvider {
     private void registerTerminalPartModel(ResourceLocation id, String parentTerminal) {
         var path = id.getPath();
         var partName = path.substring(0, path.lastIndexOf('_'));
-        var lightsBright = Ae2LabeledPatterns.makeId("part/" + partName + "_terminal_bright");
-        var lightsMedium = Ae2LabeledPatterns.makeId("part/" + partName + "_terminal_medium");
-        var lightsDark = Ae2LabeledPatterns.makeId("part/" + partName + "_terminal_dark");
+        var lightsBright = AE2LabeledPatterns.makeId("part/" + partName + "_terminal_bright");
+        var lightsMedium = AE2LabeledPatterns.makeId("part/" + partName + "_terminal_medium");
+        var lightsDark = AE2LabeledPatterns.makeId("part/" + partName + "_terminal_dark");
 
         var base_on = AppEng.makeId("part/" + parentTerminal + "_on");
         var base_off = AppEng.makeId("part/" + parentTerminal + "_off");

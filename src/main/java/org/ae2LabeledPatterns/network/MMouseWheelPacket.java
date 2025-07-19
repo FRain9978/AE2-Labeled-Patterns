@@ -1,8 +1,6 @@
 package org.ae2LabeledPatterns.network;
 
-import appeng.core.network.CustomAppEngPayload;
 import appeng.core.network.ServerboundPacket;
-import appeng.helpers.IMouseWheelItem;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -10,13 +8,13 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import org.ae2LabeledPatterns.Ae2LabeledPatterns;
+import org.ae2LabeledPatterns.AE2LabeledPatterns;
 import org.ae2LabeledPatterns.items.IMMouseWheelItem;
 
 public record MMouseWheelPacket(boolean wheelUp, int index) implements ServerboundPacket {
     public static final StreamCodec<RegistryFriendlyByteBuf, MMouseWheelPacket> STREAM_CODEC = StreamCodec.ofMember(MMouseWheelPacket::write, MMouseWheelPacket::decode);
     public static final CustomPacketPayload.Type<MMouseWheelPacket> TYPE =
-            new CustomPacketPayload.Type<>(Ae2LabeledPatterns.makeId("mouse_wheel_packet"));
+            new CustomPacketPayload.Type<>(AE2LabeledPatterns.makeId("mouse_wheel_packet"));
 
     public MMouseWheelPacket(boolean wheelUp, int index) {
         this.wheelUp = wheelUp;

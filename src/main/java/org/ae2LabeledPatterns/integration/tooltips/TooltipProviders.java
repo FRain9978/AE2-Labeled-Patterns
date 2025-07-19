@@ -4,14 +4,14 @@ import appeng.api.integrations.igtooltip.*;
 import appeng.block.AEBaseBlock;
 import appeng.blockentity.AEBaseBlockEntity;
 import net.minecraft.resources.ResourceLocation;
-import org.ae2LabeledPatterns.Ae2LabeledPatterns;
+import org.ae2LabeledPatterns.AE2LabeledPatterns;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TooltipProviders implements TooltipProvider {
     private static final Logger LOG = LoggerFactory.getLogger(TooltipProviders.class);
 
-    public static final ResourceLocation PATTERN_PROVIDER_LABEL = Ae2LabeledPatterns.makeId("pattern_provider_label");
+    public static final ResourceLocation PATTERN_PROVIDER_LABEL = AE2LabeledPatterns.makeId("pattern_provider_label");
 
     static {
         PartTooltips.addBody(AEBaseBlockEntity.class, new PatternProviderDataProvider());

@@ -1,0 +1,13 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ae2wtlib"
+    }
+  ],
+  "type": "ae2wtlib:upgrade",
+  "terminal": {
+    "item": "ae2labeledpatterns:wireless_labeled_pattern_access_terminal"
+  },
+  "terminalName": "labeled_pattern_access"
+}

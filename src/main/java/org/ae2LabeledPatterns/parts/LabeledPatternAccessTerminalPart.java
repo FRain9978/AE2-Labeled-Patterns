@@ -17,7 +17,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import org.ae2LabeledPatterns.Ae2LabeledPatterns;
+import org.ae2LabeledPatterns.AE2LabeledPatterns;
 import org.ae2LabeledPatterns.config.MSettings;
 import org.ae2LabeledPatterns.items.components.PatternProviderLabel;
 import org.ae2LabeledPatterns.menus.LabeledPatternAccessTerminalMenu;
@@ -26,9 +26,9 @@ import org.ae2LabeledPatterns.menus.MoveConvenience;
 
 public class LabeledPatternAccessTerminalPart extends AbstractDisplayPart implements ILabeledPatternAccessTermMenuHost {
     @PartModels
-    public static final ResourceLocation MODEL_OFF = Ae2LabeledPatterns.makeId("part/labeled_pattern_access_terminal_off");
+    public static final ResourceLocation MODEL_OFF = AE2LabeledPatterns.makeId("part/labeled_pattern_access_terminal_off");
     @PartModels
-    public static final ResourceLocation MODEL_ON = Ae2LabeledPatterns.makeId("part/labeled_pattern_access_terminal_on");
+    public static final ResourceLocation MODEL_ON = AE2LabeledPatterns.makeId("part/labeled_pattern_access_terminal_on");
     public static final IPartModel MODELS_OFF;
     public static final IPartModel MODELS_ON;
     public static final IPartModel MODELS_HAS_CHANNEL;

@@ -9,7 +9,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import org.ae2LabeledPatterns.Ae2LabeledPatterns;
+import org.ae2LabeledPatterns.AE2LabeledPatterns;
 import org.ae2LabeledPatterns.attachments.AttachmentRegisters;
 import org.ae2LabeledPatterns.items.components.PatternProviderLabel;
 
@@ -24,7 +24,7 @@ public record SaveLabelAttachmentPacket(
     );
 
     public static final Type<SaveLabelAttachmentPacket> TYPE =
-            new CustomPacketPayload.Type<>(Ae2LabeledPatterns.makeId("save_tag_attachment"));
+            new CustomPacketPayload.Type<>(AE2LabeledPatterns.makeId("save_tag_attachment"));
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

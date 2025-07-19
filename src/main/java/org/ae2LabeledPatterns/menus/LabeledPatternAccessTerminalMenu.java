@@ -14,7 +14,6 @@ import appeng.core.definitions.AEItems;
 import appeng.core.network.clientbound.SetLinkStatusPacket;
 import appeng.helpers.InventoryAction;
 import appeng.helpers.patternprovider.PatternContainer;
-import appeng.helpers.patternprovider.PatternProviderLogicHost;
 import appeng.menu.AEBaseMenu;
 import appeng.menu.guisync.GuiSync;
 import appeng.menu.guisync.LinkStatusAwareMenu;
@@ -22,7 +21,6 @@ import appeng.menu.implementations.MenuTypeBuilder;
 import appeng.util.inv.AppEngInternalInventory;
 import appeng.util.inv.FilteredInternalInventory;
 import appeng.util.inv.filter.IAEItemFilter;
-import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -32,9 +30,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import org.ae2LabeledPatterns.Ae2LabeledPatterns;
+import org.ae2LabeledPatterns.AE2LabeledPatterns;
 import org.ae2LabeledPatterns.config.MSettings;
-import org.ae2LabeledPatterns.attachments.AttachmentRegisters;
 import org.ae2LabeledPatterns.integration.CheckProvider;
 import org.ae2LabeledPatterns.items.components.PatternProviderLabel;
 import org.ae2LabeledPatterns.network.LabeledPatternAccessTerminalPacket;
@@ -54,7 +51,7 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
     private ILinkStatus linkStatus;
     public static final MenuType<LabeledPatternAccessTerminalMenu> TYPE = MenuTypeBuilder
             .create(LabeledPatternAccessTerminalMenu::new, ILabeledPatternAccessTermMenuHost.class)
-            .buildUnregistered(Ae2LabeledPatterns.makeId("labeledpatternaccessterminal"));
+            .buildUnregistered(AE2LabeledPatterns.makeId("labeled_pattern_access_terminal"));
     private static long inventorySerial = Long.MIN_VALUE;
     private final Map<PatternContainer, ContainerTracker> diList;
     private final Long2ObjectOpenHashMap<ContainerTracker> byId;

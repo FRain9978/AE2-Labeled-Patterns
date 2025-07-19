@@ -14,7 +14,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import org.ae2LabeledPatterns.Ae2LabeledPatterns;
+import org.ae2LabeledPatterns.AE2LabeledPatterns;
 import org.ae2LabeledPatterns.menus.LabeledPatternAccessTerminalScreen;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +41,7 @@ public record LabeledPatternAccessTerminalPacket(
                     ItemStack.OPTIONAL_STREAM_CODEC, 128);
 
     public static final Type<LabeledPatternAccessTerminalPacket> TYPE =
-            new CustomPacketPayload.Type<>(Ae2LabeledPatterns.makeId("advanced_pattern_access_terminal"));
+            new CustomPacketPayload.Type<>(AE2LabeledPatterns.makeId("advanced_pattern_access_terminal"));
 
     @Override
     public Type<LabeledPatternAccessTerminalPacket> type() {
@@ -103,7 +103,7 @@ public record LabeledPatternAccessTerminalPacket(
     @Override
     @OnlyIn(Dist.CLIENT)
     public void handleOnClient(Player player) {
-        if (Minecraft.getInstance().screen instanceof LabeledPatternAccessTerminalScreen patternAccessTerminal) {
+        if (Minecraft.getInstance().screen instanceof LabeledPatternAccessTerminalScreen<?> patternAccessTerminal) {
             LoggerFactory.getLogger(this.getClass()).debug("Handling labeled pattern access terminal packet for player: {}", player.getName().getString());
             if (fullUpdate) {
                 patternAccessTerminal.postFullUpdate(this.inventoryId, sortBy, group, inventorySize, slots);
