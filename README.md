@@ -4,7 +4,7 @@
 A simple mod adds the ability to label pattern providers in Applied Energistics 2, allowing you to organize your patterns in new pattern access terminal.
 ## Features
 - New labeler tool to label any pattern provider.
-- New ME pattern access terminal that can display labeled patterns separately according to labels.
+- New ME pattern access terminal that can display labeled patterns separately according to labels.(as well as a wireless version when you installed ae2wtlib)
 - Provide quick move(shift click) ability between pattern slots and player inventory for encoded patterns in new pattern access terminal.
 
 Quickly insert patterns into slot. Also offers check boxes to select a target group for quick move.
