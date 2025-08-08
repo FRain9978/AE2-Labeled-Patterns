@@ -15,11 +15,14 @@ import org.ae2LabeledPatterns.items.components.LabelerSetting;
 import org.ae2LabeledPatterns.items.components.PatternProviderLabel;
 import org.ae2LabeledPatterns.menus.widgets.MActionButton;
 import org.ae2LabeledPatterns.menus.widgets.LabelListButton;
+import org.ae2LabeledPatterns.menus.widgets.MIcon;
+import org.ae2LabeledPatterns.menus.widgets.MToggleButton;
 
 public class LabelerScreen extends AEBaseScreen<LabelerMenu> {
 
     private final AETextField inputField;
     private final ToggleButton lockButton;
+    private final MToggleButton renameButton;
 //    private final IconButton confirmButton;
     private final IconButton saveButton;
 
@@ -33,16 +36,12 @@ public class LabelerScreen extends AEBaseScreen<LabelerMenu> {
         }
 
         lockButton = new ToggleButton(Icon.LOCKED, Icon.UNLOCKED, GUIText.LabelerEditLock.text(), GUIText.LabelerEditLockHint.text(),
-                (isLocked) -> this.menu.setSetting(new LabelerSetting(isLocked? YesNo.YES : YesNo.NO, this.menu.setting.mode())));
+                (isLocked) -> this.menu.setSetting(new LabelerSetting(isLocked? YesNo.YES : YesNo.NO, this.menu.setting.mode(), this.menu.setting.isRename())));
         this.addToLeftToolbar(lockButton);
 
-//        confirmButton = new MActionButton(Icon.VIEW_MODE_CRAFTING, (button) -> {
-//            if (this.menu.setting.isLockEdit() == YesNo.YES) return;
-//            var text = this.inputField.getValue();
-//            if (!text.isBlank()) {
-//                this.menu.setCurrentLabel(new PatternProviderLabel(text));
-//            }
-//        }, GUIText.LabelerEditConfirm.text());
+        renameButton = new MToggleButton(MIcon.RENAME_ON.getBlitter(), MIcon.RENAME_OFF.getBlitter(), GUIText.LabelerRenameButtonTitle.text(), GUIText.LabelerRenameButtonHint.text(),
+                (isRename) -> this.menu.setSetting(new LabelerSetting(this.menu.setting.isLockEdit(), this.menu.setting.mode(), isRename)));
+        this.addToLeftToolbar(renameButton);
 
         saveButton = new MActionButton(Icon.STORAGE_FILTER_EXTRACTABLE_NONE, (button) -> {
             var text = this.inputField.getValue();
@@ -51,12 +50,9 @@ public class LabelerScreen extends AEBaseScreen<LabelerMenu> {
             }
         }, GUIText.LabelerEditSave.text());
 
-//        widgets.add("confirm", confirmButton);
-
         var host = this.menu.getHost();
         if (host instanceof ISubMenuHost){
             addToLeftToolbar(LabelListButton.create(this, (ISubMenuHost) host , GUIText.LabelerOpenList.text()));
-//            addToLeftToolbar(saveButton);
             widgets.add("save", saveButton);
         }
     }
@@ -71,12 +67,12 @@ public class LabelerScreen extends AEBaseScreen<LabelerMenu> {
     public void updateBeforeRender() {
         super.updateBeforeRender();
         lockButton.setState(this.menu.setting.isLockEdit() == YesNo.YES);
+        renameButton.setState(this.menu.setting.isRename());
         var isLocked = this.menu.setting.isLockEdit() == YesNo.YES;
         inputField.setEditable(!isLocked);
         if(isLocked){
             inputField.setFocused(false);
         }
-//        confirmButton.active = !isLocked;
     }
 
     @Override

@@ -9,6 +9,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import org.ae2LabeledPatterns.attachments.AttachmentRegisters;
 import org.ae2LabeledPatterns.items.components.PatternProviderLabel;
+import org.ae2LabeledPatterns.menus.InGameTooltip;
 
 @SuppressWarnings({"UnstableApiUsage", "NonExtendableApiUsage"})
 public final class PatternProviderDataProvider
@@ -26,7 +27,7 @@ public final class PatternProviderDataProvider
             if (!labelData.isEmpty()){
                 var label = PatternProviderLabel.readFromNBT(labelData);
                 if (!label.isEmpty()) {
-                    tooltip.addLine(InGameTooltip.PatternProviderLabel.text(label.name()));
+                    tooltip.addLine(WailaToolTip.PatternProviderLabel.text(label.name()));
                 }
             }
         }

@@ -7,6 +7,14 @@ import org.ae2LabeledPatterns.AE2LabeledPatterns;
 import org.jetbrains.annotations.NotNull;
 
 public enum GUIText implements LocalizationEnum {
+    LabelerHoverTooltipLabel("Label: %s", "标签: %s"),
+    LabelerHoverTooltipMode("Mode: %s", "模式: %s"),
+    LabelerHoverTooltipRenameOn("Rename function is on", "重命名功能开启"),
+    LabelerHoverTooltipRenameOff("Rename function is off", "重命名功能关闭"),
+    LabelerHoverTooltipShiftTip("Hold Shift to see more information", "按住Shift键查看更多信息"),
+    LabelerHoverTooltipChangeMode("Hold %s and scroll mouse to change mode", "按住键 %s 并滚动鼠标以更改模式"),
+    LabelerHoverTooltipChangeLabel("Hold %s and scroll mouse to change label", "按住键 %s 并滚动鼠标以更改标签"),
+
     LabelerInputPlaceHolder("type label name here", "请输入标签名称"),
     LabelerTitle("Labeler", "标签工具"),
     LabelerEditConfirm("Confirm", "确认"),
@@ -14,6 +22,8 @@ public enum GUIText implements LocalizationEnum {
     LabelerEditLock("Lock Edit", "输入锁定"),
     LabelerEditLockHint("Block the input field for editing", "锁定输入框以防止编辑"),
     LabelerOpenList("Open Label List", "打开标签列表"),
+    LabelerRenameButtonTitle("Rename Function", "重命名功能"),
+    LabelerRenameButtonHint("Enable to edit the provider's custom name instead of label.", "开启以修改供应器的自定义名称而不是标签。"),
     LabelListTitle("Saved Labels", "保存的标签"),
     LabelListSelect("Select", "选择"),
     LabelListDelete("Delete", "删除"),
@@ -24,10 +34,6 @@ public enum GUIText implements LocalizationEnum {
     // -------------------button text-------------------
     MoveConvenienceButtonTitle("Quick Move Convenience", "快速移动便利"),
     MoveConvenienceButtonNone("None", "无"),
-//    MoveConvenienceButtonForAll("Try to insert the same pattern to every single pattern provider when current filtering label is not empty. Need to have blank pattern in your inventory",
-//            "当有过滤标签时，尝试将相同的样板插入到的每一个样板供应器中。物品栏中需要有空白样板。"),
-//    MoveConvenienceButtonForAllStrict("Strictly insert the same pattern to every single pattern provider when current filtering label is not empty. If you don't have enough blank patterns in your inventory, it will not work.",
-//            "严格地将相同的样板插入到的每一个样板供应器中。如果物品栏中没有足够的空白样板，将不会起效。"),
     MoveConvenienceButtonForAll("Try to insert the same pattern to all pattern providers in current selected group. Need blank patterns.",
             "试图将相同的样板插入到的每一个样板供应器中，需要空白样板。"),
     MoveConvenienceButtonForAllStrict("Strictly insert pattern to providers. Only work with enough blank patterns.",

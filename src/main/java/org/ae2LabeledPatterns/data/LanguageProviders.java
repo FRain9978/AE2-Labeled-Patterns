@@ -5,8 +5,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.data.LanguageProvider;
 import org.ae2LabeledPatterns.AE2LabeledPatterns;
 import org.ae2LabeledPatterns.AE2LabeledPatternsClient;
-import org.ae2LabeledPatterns.integration.ae2wtlib.AE2wtlibRegisters;
-import org.ae2LabeledPatterns.integration.tooltips.InGameTooltip;
+import org.ae2LabeledPatterns.integration.tooltips.WailaToolTip;
+import org.ae2LabeledPatterns.menus.InGameTooltip;
 import org.ae2LabeledPatterns.integration.tooltips.TooltipProviders;
 import org.ae2LabeledPatterns.items.ItemRegisters;
 import org.ae2LabeledPatterns.menus.GUIText;
@@ -30,6 +30,9 @@ public class LanguageProviders {
                 this.add(gui.getTranslationKey(), gui.getChineseText());
             }
             for (var gui: InGameTooltip.values()){
+                this.add(gui.getTranslationKey(), gui.getChineseText());
+            }
+            for (var gui: WailaToolTip.values()){
                 this.add(gui.getTranslationKey(), gui.getChineseText());
             }
 
@@ -57,6 +60,9 @@ public class LanguageProviders {
                 this.add(gui.getTranslationKey(), gui.getEnglishText());
             }
             for (var gui: InGameTooltip.values()){
+                this.add(gui.getTranslationKey(), gui.getEnglishText());
+            }
+            for (var gui: WailaToolTip.values()){
                 this.add(gui.getTranslationKey(), gui.getEnglishText());
             }
 

@@ -8,14 +8,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MActionButton extends IconButton {
-    private final Icon icon;
+public class MActionButton extends MIconButton {
     private Component titleMessage;
     private List<Component> extraTooltip;
 
     public MActionButton(@NotNull Icon icon , OnPress onPress) {
-        super(onPress);
-        this.icon = icon;
+        super(onPress, icon);
     }
 
     public MActionButton(@NotNull Icon icon , OnPress onPress, @NotNull Component titleMessage) {
@@ -25,11 +23,6 @@ public class MActionButton extends IconButton {
 
     public void setExtraTooltip(List<Component> extraTooltip) {
         this.extraTooltip = extraTooltip;
-    }
-
-    @Override
-    protected Icon getIcon() {
-        return icon;
     }
 
     @Override

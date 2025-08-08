@@ -7,6 +7,7 @@ import appeng.api.implementations.menuobjects.ItemMenuHost;
 import appeng.api.storage.ISubMenuHost;
 import appeng.api.util.IConfigManager;
 import appeng.api.util.IConfigurableObject;
+import appeng.blockentity.AEBaseBlockEntity;
 import appeng.menu.ISubMenu;
 import appeng.menu.MenuOpener;
 import appeng.menu.locator.ItemMenuHostLocator;
@@ -26,11 +27,13 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
+import org.ae2LabeledPatterns.AE2LabeledPatternsClient;
 import org.ae2LabeledPatterns.config.Config;
 import org.ae2LabeledPatterns.config.MSettings;
 import org.ae2LabeledPatterns.attachments.AttachmentRegisters;
 import org.ae2LabeledPatterns.integration.CheckProvider;
-import org.ae2LabeledPatterns.integration.tooltips.InGameTooltip;
+import org.ae2LabeledPatterns.menus.GUIText;
+import org.ae2LabeledPatterns.menus.InGameTooltip;
 import org.ae2LabeledPatterns.items.components.*;
 import org.ae2LabeledPatterns.menus.LabelerMenu;
 import org.ae2LabeledPatterns.network.SaveLabelAttachmentPacket;
@@ -38,6 +41,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -79,9 +83,18 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
         var selfData = stack.getComponents().getOrDefault(ComponentRegisters.PATTERN_PROVIDER_LABEL.get(), new PatternProviderLabel("Sample"));
         var currentSetting = stack.get(LABELER_SETTING.get());
-        tooltipComponents.add(InGameTooltip.LabelerHoverTooltipLabel.text(selfData.name()).withColor(Color.GREEN.getRGB()));
+        tooltipComponents.add(GUIText.LabelerHoverTooltipLabel.text(selfData.name()).withColor(Color.GREEN.getRGB()));
         if (currentSetting != null) {
-            tooltipComponents.add(InGameTooltip.LabelerHoverTooltipMode.text(currentSetting.mode().text()).withColor(Color.CYAN.getRGB()));
+            tooltipComponents.add(GUIText.LabelerHoverTooltipMode.text(currentSetting.mode().text()).withColor(Color.CYAN.getRGB()));
+            tooltipComponents.add(currentSetting.isRename() ?
+                    GUIText.LabelerHoverTooltipRenameOn.text().withColor(Color.WHITE.getRGB()) :
+                    GUIText.LabelerHoverTooltipRenameOff.text().withColor(Color.LIGHT_GRAY.getRGB()));
+        }
+        if (tooltipFlag.hasShiftDown()){
+            tooltipComponents.add(GUIText.LabelerHoverTooltipChangeMode.text(AE2LabeledPatternsClient.MOUSE_WHEEL_ITEM_MODIFIER_1.getKey().getDisplayName()).withColor(Color.ORANGE.getRGB()));
+            tooltipComponents.add(GUIText.LabelerHoverTooltipChangeLabel.text(AE2LabeledPatternsClient.MOUSE_WHEEL_ITEM_MODIFIER_2.getKey().getDisplayName()).withColor(Color.ORANGE.getRGB()));
+        }else{
+            tooltipComponents.add(GUIText.LabelerHoverTooltipShiftTip.text().withColor(Color.GRAY.getRGB()));
         }
     }
 
@@ -119,7 +132,13 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                             var hasLabel = itemStack.has(ComponentRegisters.PATTERN_PROVIDER_LABEL.get());
                             if (hasLabel){
                                 var label = itemStack.getComponents().get(ComponentRegisters.PATTERN_PROVIDER_LABEL.get());
-                                setProviderLabel(serverPlayer, blockEntity, label, true);
+                                if (label != null){
+                                    if (setting.isRename()){
+                                        setProviderName(serverPlayer, blockEntity, label, true);
+                                    }else{
+                                        setProviderLabel(serverPlayer, blockEntity, label, true);
+                                    }
+                                }
                             }
                             return InteractionResult.sidedSuccess(false);
                         }
@@ -133,7 +152,11 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                         }
                         ServerPlayer serverPlayer = (ServerPlayer) player;
                         if (player.isCrouching()) {
-                            clearProviderLabel(serverPlayer, blockEntity, true);
+                            if (setting.isRename()){
+                                clearProviderName(serverPlayer, blockEntity, true);
+                            }else {
+                                clearProviderLabel(serverPlayer, blockEntity, true);
+                            }
                             return InteractionResult.sidedSuccess(false);
                         }
                     }
@@ -165,11 +188,19 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                         ServerPlayer serverPlayer = (ServerPlayer) player;
                         var label = itemStack.get(ComponentRegisters.PATTERN_PROVIDER_LABEL.get());
                         // get all the blockEntity between the points
-                        areaSetProviderLabel(p1, p2, level, serverPlayer, label, false);
+                        if (setting.isRename()){
+                            areaSetProviderName(p1, p2, level, serverPlayer, label, false);
+                        }else{
+                            areaSetProviderLabel(p1, p2, level, serverPlayer, label, false);
+                        }
                         // clear the currentPosTarget
                         itemStack.set(ComponentRegisters.MULTI_BLOCK_TARGET.get(), currentPosTarget.clear());
                         if (label != null) {
-                            player.sendSystemMessage(InGameTooltip.LabelerAreaSetProviderLabel.text(label.name()));
+                            if (setting.isRename()){
+                                player.sendSystemMessage(InGameTooltip.LabelerAreaSetProviderName.text(label.name()));
+                            }else {
+                                player.sendSystemMessage(InGameTooltip.LabelerAreaSetProviderLabel.text(label.name()));
+                            }
                         }
                     }else{
                         itemStack.set(ComponentRegisters.MULTI_BLOCK_TARGET.get(), currentPosTarget);
@@ -201,10 +232,18 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                         }
                         ServerPlayer serverPlayer = (ServerPlayer) player;
                         // get all the blockEntity between the points
-                        areaClearProviderLabel(p1, p2, level, serverPlayer, false);
+                        if (setting.isRename()){
+                            areaClearProviderName(p1, p2, level, serverPlayer, false);
+                        }else{
+                            areaClearProviderLabel(p1, p2, level, serverPlayer, false);
+                        }
                         // clear the currentPosTarget
                         itemStack.set(ComponentRegisters.MULTI_BLOCK_TARGET.get(), currentPosTarget.clear());
-                        player.sendSystemMessage(InGameTooltip.LabelerAreaClearProviderLabel.text());
+                        if (setting.isRename()){
+                            player.sendSystemMessage(InGameTooltip.LabelerAreaClearProviderName.text());
+                        }else {
+                            player.sendSystemMessage(InGameTooltip.LabelerAreaClearProviderLabel.text());
+                        }
                     }else{
                         itemStack.set(ComponentRegisters.MULTI_BLOCK_TARGET.get(), currentPosTarget);
                         player.sendSystemMessage(InGameTooltip.LabelerSelectFirstPoint.text());
@@ -216,7 +255,17 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                         return InteractionResult.sidedSuccess(true);
                     }
                     if (player.isCrouching()){
-                        PatternProviderLabel data = CheckProvider.getEntityProviderLabel(blockEntity);
+                        PatternProviderLabel data = PatternProviderLabel.Empty;
+                        if (setting.isRename()){
+                            if (blockEntity instanceof AEBaseBlockEntity aeBaseBlockEntity){
+                                var customName = aeBaseBlockEntity.getCustomName();
+                                if (customName != null && !customName.getString().isBlank()){
+                                    data = new PatternProviderLabel(customName.getString());
+                                }
+                            }
+                        }else{
+                            data = CheckProvider.getEntityProviderLabel(blockEntity);
+                        }
                         if (!data.isEmpty()) {
                             var savedLabels = itemStack.get(SAVED_LABELS.get());
                             if (savedLabels != null) {
@@ -229,7 +278,11 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                                 itemStack.set(SAVED_LABELS.get(), List.of(data));
                             }
                             itemStack.set(PATTERN_PROVIDER_LABEL.get(), data);
-                            player.sendSystemMessage(InGameTooltip.LabelerCopiedLabel.text(data.name()));
+                            if (setting.isRename()){
+                                player.sendSystemMessage(InGameTooltip.LabelerCopiedName.text(data.name()));
+                            }else {
+                                player.sendSystemMessage(InGameTooltip.LabelerCopiedLabel.text(data.name()));
+                            }
                         }
 
                         return InteractionResult.sidedSuccess(false);
@@ -254,6 +307,16 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
         }
     }
 
+    protected void setProviderName(ServerPlayer serverPlayer, BlockEntity blockEntity, PatternProviderLabel label, boolean showMessage){
+        if (blockEntity instanceof AEBaseBlockEntity aeBaseBlockEntity) {
+            aeBaseBlockEntity.setName(label.name());
+            aeBaseBlockEntity.saveChanges();
+            if (showMessage){
+                serverPlayer.sendSystemMessage(InGameTooltip.LabelerSetProviderName.text(label.name()));
+            }
+        }
+    }
+
     private void areaSetProviderLabel(BlockPos p1, BlockPos p2, Level level, ServerPlayer serverPlayer, PatternProviderLabel label, boolean showMessage){
         for (int x = Math.min(p1.getX(), p2.getX()); x <= Math.max(p1.getX(), p2.getX()); x++) {
             for (int y = Math.min(p1.getY(), p2.getY()); y <= Math.max(p1.getY(), p2.getY()); y++) {
@@ -261,6 +324,19 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                     BlockEntity be = level.getBlockEntity(new BlockPos(x, y, z));
                     if (CheckProvider.isEntityProvider(be)) {
                         setProviderLabel(serverPlayer, be, label, showMessage);
+                    }
+                }
+            }
+        }
+    }
+
+    private void areaSetProviderName(BlockPos p1, BlockPos p2, Level level, ServerPlayer serverPlayer, PatternProviderLabel label, boolean showMessage){
+        for (int x = Math.min(p1.getX(), p2.getX()); x <= Math.max(p1.getX(), p2.getX()); x++) {
+            for (int y = Math.min(p1.getY(), p2.getY()); y <= Math.max(p1.getY(), p2.getY()); y++) {
+                for (int z = Math.min(p1.getZ(), p2.getZ()); z <= Math.max(p1.getZ(), p2.getZ()); z++) {
+                    BlockEntity be = level.getBlockEntity(new BlockPos(x, y, z));
+                    if (CheckProvider.isEntityProvider(be)) {
+                        setProviderName(serverPlayer, be, label, showMessage);
                     }
                 }
             }
@@ -276,6 +352,32 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                 new SaveLabelAttachmentPacket(new PatternProviderLabel(), blockEntity.getBlockPos()));
     }
 
+    private static final Field customName;
+
+    static {
+        try {
+            customName = AEBaseBlockEntity.class.getDeclaredField("customName");
+            customName.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected void clearProviderName(ServerPlayer serverPlayer, BlockEntity blockEntity, boolean showMessage) {
+        try {
+            if (blockEntity instanceof AEBaseBlockEntity aeBaseBlockEntity) {
+                customName.set(aeBaseBlockEntity, null);
+                aeBaseBlockEntity.saveChanges();
+                if (showMessage){
+                    serverPlayer.sendSystemMessage(InGameTooltip.LabelerClearProviderName.text());
+                }
+            }
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Failed to clear provider name", e);
+        }
+
+    }
+
     private void areaClearProviderLabel(BlockPos p1, BlockPos p2, Level level, ServerPlayer serverPlayer, boolean showMessage) {
         for (int x = Math.min(p1.getX(), p2.getX()); x <= Math.max(p1.getX(), p2.getX()); x++) {
             for (int y = Math.min(p1.getY(), p2.getY()); y <= Math.max(p1.getY(), p2.getY()); y++) {
@@ -283,6 +385,19 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                     BlockEntity be = level.getBlockEntity(new BlockPos(x, y, z));
                     if (CheckProvider.isEntityProvider(be)) {
                         clearProviderLabel(serverPlayer, be, showMessage);
+                    }
+                }
+            }
+        }
+    }
+
+    private void areaClearProviderName(BlockPos p1, BlockPos p2, Level level, ServerPlayer serverPlayer, boolean showMessage) {
+        for (int x = Math.min(p1.getX(), p2.getX()); x <= Math.max(p1.getX(), p2.getX()); x++) {
+            for (int y = Math.min(p1.getY(), p2.getY()); y <= Math.max(p1.getY(), p2.getY()); y++) {
+                for (int z = Math.min(p1.getZ(), p2.getZ()); z <= Math.max(p1.getZ(), p2.getZ()); z++) {
+                    BlockEntity be = level.getBlockEntity(new BlockPos(x, y, z));
+                    if (CheckProvider.isEntityProvider(be)) {
+                        clearProviderName(serverPlayer, be, showMessage);
                     }
                 }
             }
@@ -318,7 +433,7 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
             if (setting != null) {
                 var currentValue = setting.mode();
                 var newValue = EnumCycler.rotateEnum(currentValue, up, Set.of(LabelerMode.values()));
-                is.set(LABELER_SETTING.get(), new LabelerSetting(setting.isLockEdit(), newValue));
+                is.set(LABELER_SETTING.get(), new LabelerSetting(setting.isLockEdit(), newValue, setting.isRename()));
                 is.update(MULTI_BLOCK_TARGET.get(), new MultiBlockTarget(), MultiBlockTarget::clear);
                 serverPlayer.displayClientMessage(InGameTooltip.CycleLabelerMode.text(newValue.text()).withColor(Color.CYAN.getRGB()), true);
             }

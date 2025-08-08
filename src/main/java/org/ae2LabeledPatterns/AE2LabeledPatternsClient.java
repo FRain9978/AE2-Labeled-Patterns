@@ -30,11 +30,11 @@ public class AE2LabeledPatternsClient {
     public static final String KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_2_DESCRIPTION = "key." + AE2LabeledPatterns.MODID + ".mouse_wheel_item_modifier_2.description";
     public static final String KEYBINDING_MOD_CATEGORY = "key." + AE2LabeledPatterns.MODID + ".category";
 
-    private static final KeyMapping MOUSE_WHEEL_ITEM_MODIFIER_1 = new KeyMapping(
+    public static final KeyMapping MOUSE_WHEEL_ITEM_MODIFIER_1 = new KeyMapping(
             KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_1_DESCRIPTION, KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM,
             InputConstants.KEY_LSHIFT, KEYBINDING_MOD_CATEGORY);
 
-    private static final KeyMapping MOUSE_WHEEL_ITEM_MODIFIER_2 = new KeyMapping(
+    public static final KeyMapping MOUSE_WHEEL_ITEM_MODIFIER_2 = new KeyMapping(
             KEYBINDING_MOUSE_WHEEL_ITEM_MODIFIER_2_DESCRIPTION, KeyConflictContext.IN_GAME, InputConstants.Type.KEYSYM,
             InputConstants.KEY_LALT, KEYBINDING_MOD_CATEGORY);
 

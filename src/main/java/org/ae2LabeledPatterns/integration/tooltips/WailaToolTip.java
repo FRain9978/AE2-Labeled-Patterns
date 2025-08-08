@@ -1,0 +1,55 @@
+package org.ae2LabeledPatterns.integration.tooltips;
+
+import appeng.core.localization.LocalizationEnum;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import org.ae2LabeledPatterns.AE2LabeledPatterns;
+import org.jetbrains.annotations.NotNull;
+
+public enum WailaToolTip implements LocalizationEnum {
+    PatternProviderLabel("Label: %s","标签: %s"),
+    ;
+
+    private final String root = "waila." + AE2LabeledPatterns.MODID;
+
+    @NotNull
+    private final String englishText;
+
+    private final String chineseText;
+
+    private final Component text;
+
+    WailaToolTip(@NotNull String englishText) {
+        this.englishText = englishText;
+        this.chineseText = englishText;
+        this.text = Component.translatable(getTranslationKey());
+    }
+
+    WailaToolTip(@NotNull String englishText, String chineseText) {
+        this.englishText = englishText;
+        this.chineseText = chineseText;
+        this.text = Component.translatable(getTranslationKey());
+    }
+
+    public @NotNull String getEnglishText() {
+        return englishText;
+    }
+
+    public @NotNull String getChineseText() {
+        return chineseText;
+    }
+
+    @Override
+    public String getTranslationKey() {
+        return this.root + '.' + name().toLowerCase();
+    }
+
+    @Override
+    public MutableComponent text() {
+        return (MutableComponent) this.text;
+    }
+
+    public String getLocal() {
+        return text.getString();
+    }
+}

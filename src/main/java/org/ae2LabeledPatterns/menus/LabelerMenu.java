@@ -30,17 +30,17 @@ public class LabelerMenu extends AEBaseMenu implements ILabelsProvider {
     public List<PatternProviderLabel> saved_labels;
     public LabelerSetting setting;
 
-    private final ItemStack iHost;
+    private final ItemStack hostItem;
     private final ItemMenuHost<?> host;
 
     public LabelerMenu(int id, Inventory playerInventory, ItemMenuHost<?> host) {
         super(TYPE, id, playerInventory, host);
 
         this.host = host;
-        iHost = host.getItemStack();
-        label = iHost.getOrDefault(ComponentRegisters.PATTERN_PROVIDER_LABEL, new PatternProviderLabel());
-        saved_labels = iHost.getOrDefault(ComponentRegisters.SAVED_LABELS, new ArrayList<>());
-        setting = iHost.getOrDefault(ComponentRegisters.LABELER_SETTING, new LabelerSetting());
+        hostItem = host.getItemStack();
+        label = hostItem.getOrDefault(ComponentRegisters.PATTERN_PROVIDER_LABEL, new PatternProviderLabel());
+        saved_labels = hostItem.getOrDefault(ComponentRegisters.SAVED_LABELS, new ArrayList<>());
+        setting = hostItem.getOrDefault(ComponentRegisters.LABELER_SETTING, new LabelerSetting());
 
         registerClientAction(ACTION_SET_LABEL, PatternProviderLabel.class, this::setCurrentLabel);
         registerClientAction(ACTION_SET_SETTING, LabelerSetting.class, this::setSetting);
@@ -54,14 +54,14 @@ public class LabelerMenu extends AEBaseMenu implements ILabelsProvider {
         if (isClientSide()) {
             sendClientAction(ACTION_SET_SETTING, labelerSetting);
         }else {
-            iHost.set(ComponentRegisters.LABELER_SETTING, labelerSetting);
+            hostItem.set(ComponentRegisters.LABELER_SETTING, labelerSetting);
         }
     }
 
     public void saveLabel(PatternProviderLabel label) {
         LogUtils.getLogger().debug("saveLabel:{}", label);
         this.label = label;
-        iHost.set(ComponentRegisters.PATTERN_PROVIDER_LABEL, label);
+        hostItem.set(ComponentRegisters.PATTERN_PROVIDER_LABEL, label);
         addLabel(label);
         if (isClientSide()) {
             sendClientAction(ACTION_SAVE_LABEL, label);
@@ -80,17 +80,17 @@ public class LabelerMenu extends AEBaseMenu implements ILabelsProvider {
 
     @Override
     public PatternProviderLabel currentLabel() {
-        return iHost.getOrDefault(ComponentRegisters.PATTERN_PROVIDER_LABEL, new PatternProviderLabel());
+        return hostItem.getOrDefault(ComponentRegisters.PATTERN_PROVIDER_LABEL, new PatternProviderLabel());
     }
 
     @Override
     public boolean addLabel(PatternProviderLabel label) {
         if (label == null) return false;
-        List<PatternProviderLabel> labels = iHost.getOrDefault(ComponentRegisters.SAVED_LABELS, new LinkedList<>());
+        List<PatternProviderLabel> labels = hostItem.getOrDefault(ComponentRegisters.SAVED_LABELS, new LinkedList<>());
         if (labels.contains(label)) return false;
         labels = new LinkedList<>(labels);
         labels.add(label);
-        iHost.set(ComponentRegisters.SAVED_LABELS, labels);
+        hostItem.set(ComponentRegisters.SAVED_LABELS, labels);
         saved_labels = labels;
         return true;
     }
@@ -98,11 +98,11 @@ public class LabelerMenu extends AEBaseMenu implements ILabelsProvider {
     @Override
     public boolean removeLabel(PatternProviderLabel label) {
         if (label == null) return false;
-        List<PatternProviderLabel> labels = iHost.getOrDefault(ComponentRegisters.SAVED_LABELS, new LinkedList<>());
+        List<PatternProviderLabel> labels = hostItem.getOrDefault(ComponentRegisters.SAVED_LABELS, new LinkedList<>());
         if (!labels.contains(label)) return false;
         labels = new LinkedList<>(labels);
         labels.remove(label);
-        iHost.set(ComponentRegisters.SAVED_LABELS, labels);
+        hostItem.set(ComponentRegisters.SAVED_LABELS, labels);
         saved_labels = labels;
         return true;
     }
@@ -110,7 +110,7 @@ public class LabelerMenu extends AEBaseMenu implements ILabelsProvider {
     @Override
     public boolean hasLabel(PatternProviderLabel label) {
         if (label == null) return false;
-        List<PatternProviderLabel> labels = iHost.getOrDefault(ComponentRegisters.SAVED_LABELS, new LinkedList<>());
+        List<PatternProviderLabel> labels = hostItem.getOrDefault(ComponentRegisters.SAVED_LABELS, new LinkedList<>());
         return labels.contains(label);
     }
 
@@ -118,7 +118,7 @@ public class LabelerMenu extends AEBaseMenu implements ILabelsProvider {
     public void setCurrentLabel(PatternProviderLabel label) {
         LogUtils.getLogger().debug("setLabel:{}", label);
         this.label = label;
-        iHost.set(ComponentRegisters.PATTERN_PROVIDER_LABEL, label);
+        hostItem.set(ComponentRegisters.PATTERN_PROVIDER_LABEL, label);
         if (isClientSide()) {
             sendClientAction(ACTION_SET_LABEL, label);
         }else {

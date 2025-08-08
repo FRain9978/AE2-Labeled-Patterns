@@ -2,7 +2,7 @@ package org.ae2LabeledPatterns.items.components;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import org.ae2LabeledPatterns.integration.tooltips.InGameTooltip;
+import org.ae2LabeledPatterns.menus.InGameTooltip;
 
 public enum LabelerMode implements IModeComponent {
     SINGLE_SET(InGameTooltip.LabelerModeSingleSet.text()),
