@@ -1,15 +1,13 @@
 package org.ae2LabeledPatterns.menus;
 
-import appeng.api.config.Settings;
-import appeng.api.config.ShowPatternProviders;
-import appeng.api.config.TerminalStyle;
-import appeng.api.config.YesNo;
+import appeng.api.config.*;
 import appeng.api.crafting.IPatternDetails;
 import appeng.api.crafting.PatternDetailsHelper;
 import appeng.api.implementations.blockentities.PatternContainerGroup;
 import appeng.api.stacks.GenericStack;
 import appeng.api.storage.ILinkStatus;
 import appeng.client.gui.AEBaseScreen;
+import appeng.client.gui.AESubScreen;
 import appeng.client.gui.Icon;
 import appeng.client.gui.me.patternaccess.PatternContainerRecord;
 import appeng.client.gui.me.patternaccess.PatternSlot;
@@ -44,7 +42,9 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.ae2LabeledPatterns.config.ClientConfig;
 import org.ae2LabeledPatterns.config.MSettings;
+import org.ae2LabeledPatterns.menus.subscreens.LabeledTerminalSettingScreen;
 import org.ae2LabeledPatterns.menus.widgets.MActionButton;
 import org.ae2LabeledPatterns.menus.widgets.MServerSettingToggleButton;
 import org.ae2LabeledPatterns.network.InventoryQuickMovePacket;
@@ -95,6 +95,8 @@ public class LabeledPatternAccessTerminalScreen<W extends LabeledPatternAccessTe
 
     private boolean isShowGroupSelectRatio;
 
+    private static int lastExitScrollIndex = -1;
+
     public LabeledPatternAccessTerminalScreen(W menu, Inventory playerInventory, Component title, ScreenStyle style) {
         super(menu, playerInventory, title, style);
         this.scrollbar = this.widgets.addScrollBar("scrollbar", Scrollbar.BIG);
@@ -107,6 +109,7 @@ public class LabeledPatternAccessTerminalScreen<W extends LabeledPatternAccessTe
         this.searchField.setResponder((str) -> this.refreshList());
         this.searchField.setPlaceholder(GuiText.SearchPlaceholder.text());
 
+        this.addToLeftToolbar(new ActionButton(ActionItems.TERMINAL_SETTINGS, this::showSettings));
         cycleTagButton = new MActionButton(Icon.SORT_BY_MOD,
                 (button) -> {
                    this.menu.cycleTag(isHandlingRightClick());
@@ -125,7 +128,9 @@ public class LabeledPatternAccessTerminalScreen<W extends LabeledPatternAccessTe
                 (this.height - GUI_HEADER_HEIGHT - GUI_FOOTER_HEIGHT - GUI_TOP_AND_BOTTOM_PADDING) / ROW_HEIGHT));
         this.imageHeight = GUI_HEADER_HEIGHT + GUI_FOOTER_HEIGHT + this.visibleRows * ROW_HEIGHT;
         super.init();
-        this.setInitialFocus(this.searchField);
+        if (ClientConfig.GetAutoFocus()){
+            this.setInitialFocus(this.searchField);
+        }
         this.resetScrollbar();
         this.clearCheckboxes();
     }
@@ -143,6 +148,11 @@ public class LabeledPatternAccessTerminalScreen<W extends LabeledPatternAccessTe
         int textColor = this.style.getColor(PaletteColor.DEFAULT_TEXT_COLOR).toARGB();
         ClientLevel level = Minecraft.getInstance().level;
         int scrollLevel = this.scrollbar.getCurrentScroll();
+        if (ClientConfig.GetRememberPosition() && lastExitScrollIndex != -1){
+            scrollLevel = Math.max(lastExitScrollIndex, scrollLevel);
+            this.scrollbar.setCurrentScroll(scrollLevel);
+            lastExitScrollIndex = -1;
+        }
         Set<PatternContainerGroup> visibleGroups = new HashSet<>();
 
         for(int i = 0; i < this.visibleRows; ++i) {
@@ -562,6 +572,25 @@ public class LabeledPatternAccessTerminalScreen<W extends LabeledPatternAccessTe
         }
 
         return cache;
+    }
+
+    private void showSettings() {
+        switchToScreen(new LabeledTerminalSettingScreen<>(this));
+    }
+
+    @Override
+    public void onClose() {
+        super.onClose();
+        if (ClientConfig.GetRememberPosition()){
+            lastExitScrollIndex = this.scrollbar.getCurrentScroll();
+        }
+    }
+
+    @Override
+    protected <P extends AEBaseScreen<W>> void onReturnFromSubScreen(AESubScreen<W, P> subScreen){
+        if(subScreen instanceof LabeledTerminalSettingScreen<?>){
+            this.reinitialize();
+        }
     }
 
     private void reinitialize() {

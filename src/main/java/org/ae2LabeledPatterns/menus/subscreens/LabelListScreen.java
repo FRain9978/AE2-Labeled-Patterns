@@ -1,4 +1,4 @@
-package org.ae2LabeledPatterns.menus;
+package org.ae2LabeledPatterns.menus.subscreens;
 
 import appeng.api.storage.ISubMenuHost;
 import appeng.client.Point;
@@ -15,6 +15,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
+import org.ae2LabeledPatterns.menus.GUIText;
+import org.ae2LabeledPatterns.menus.ILabelsProvider;
 import org.ae2LabeledPatterns.menus.widgets.MActionButton;
 
 

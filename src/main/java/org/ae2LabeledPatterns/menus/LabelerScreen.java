@@ -13,6 +13,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import org.ae2LabeledPatterns.items.components.LabelerSetting;
 import org.ae2LabeledPatterns.items.components.PatternProviderLabel;
+import org.ae2LabeledPatterns.menus.subscreens.LabelListScreen;
 import org.ae2LabeledPatterns.menus.widgets.MActionButton;
 import org.ae2LabeledPatterns.menus.widgets.LabelListButton;
 import org.ae2LabeledPatterns.menus.widgets.MIcon;

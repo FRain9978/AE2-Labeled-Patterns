@@ -180,9 +180,9 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                         }
                         var p1 = t1.pos();
                         var p2 = t2.pos();
-                        if (getAreaEntityCount(p1, p2) > Config.maxAllowBlockSpace){
+                        if (getAreaEntityCount(p1, p2) > Config.maxAllowBlockSpace()){
                             itemStack.set(ComponentRegisters.MULTI_BLOCK_TARGET.get(), currentPosTarget.clear());
-                            player.sendSystemMessage(InGameTooltip.LabelerSelectedAreaTooBig.text(Config.maxAllowBlockSpace));
+                            player.sendSystemMessage(InGameTooltip.LabelerSelectedAreaTooBig.text(Config.maxAllowBlockSpace()));
                             return InteractionResult.sidedSuccess(false);
                         }
                         ServerPlayer serverPlayer = (ServerPlayer) player;
@@ -226,8 +226,8 @@ public class LabelerItem extends Item implements IMenuItem, IConfigurableObject,
                         }
                         var p1 = t1.pos();
                         var p2 = t2.pos();
-                        if (getAreaEntityCount(p1, p2) > Config.maxAllowBlockSpace){
-                            player.sendSystemMessage(InGameTooltip.LabelerSelectedAreaTooBig.text(Config.maxAllowBlockSpace));
+                        if (getAreaEntityCount(p1, p2) > Config.maxAllowBlockSpace()){
+                            player.sendSystemMessage(InGameTooltip.LabelerSelectedAreaTooBig.text(Config.maxAllowBlockSpace()));
                             return InteractionResult.sidedSuccess(false);
                         }
                         ServerPlayer serverPlayer = (ServerPlayer) player;

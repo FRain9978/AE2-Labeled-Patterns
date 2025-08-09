@@ -24,20 +24,24 @@ public enum GUIText implements LocalizationEnum {
     LabelerOpenList("Open Label List", "打开标签列表"),
     LabelerRenameButtonTitle("Rename Function", "重命名功能"),
     LabelerRenameButtonHint("Enable to edit the provider's custom name instead of label.", "开启以修改供应器的自定义名称而不是标签。"),
+
     LabelListTitle("Saved Labels", "保存的标签"),
     LabelListSelect("Select", "选择"),
     LabelListDelete("Delete", "删除"),
+
     LabeledTerminalCycleTagButtonMessage("Label Filter ", "标签过滤"),
     LabeledTerminalCycleTagButtonEmptyFocus("No Focusing label", "无过滤"),
     LabeledTerminalCycleTagButtonFocusing("Focusing: %s", "当前: %s"),
+    LabeledTerminalSettingAutoFocus("Auto-Focus on open", "打开时自动聚焦搜索框"),
+    LabeledTerminalSettingRememberPosition("Remember the position of scroll bar on close", "关闭时记住滚动条位置"),
+
+
 
     // -------------------button text-------------------
     MoveConvenienceButtonTitle("Quick Move Convenience", "快速移动便利"),
     MoveConvenienceButtonNone("None", "无"),
-    MoveConvenienceButtonForAll("Try to insert the same pattern to all pattern providers in current selected group. Need blank patterns.",
-            "试图将相同的样板插入到的每一个样板供应器中，需要空白样板。"),
-    MoveConvenienceButtonForAllStrict("Strictly insert pattern to providers. Only work with enough blank patterns.",
-            "严格地将样板插入供应器中。在有足够的空白样板才起效。"),
+    MoveConvenienceButtonForAll("Try to insert the same pattern to all pattern providers in current selected group. Only work with enough blank patterns.",
+            "试图将相同的样板插入到的每一个样板供应器中，有足够的空白样板才起效。"),
     ShowGroupSelectRatioTitle("Group Selection", "组选择"),
     ShowGroupSelectRatioYes("Check box is shown", "按钮显示"),
     ShowGroupSelectRatioNo("Check box is hidden", "按钮隐藏"),

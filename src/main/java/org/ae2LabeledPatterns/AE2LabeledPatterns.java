@@ -16,6 +16,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.ae2LabeledPatterns.attachments.AttachmentRegisters;
 import org.ae2LabeledPatterns.capability.CapabilityRegisters;
+import org.ae2LabeledPatterns.config.ClientConfig;
 import org.ae2LabeledPatterns.config.Config;
 import org.ae2LabeledPatterns.integration.ae2wtlib.AE2wtlibRegisters;
 import org.ae2LabeledPatterns.items.ItemRegisters;
@@ -57,6 +58,7 @@ public class AE2LabeledPatterns {
         CREATIVE_MODE_TABS.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        modContainer.registerConfig(ModConfig.Type.CLIENT, ClientConfig.SPEC);
     }
 
     public static ResourceLocation makeId(String id) {

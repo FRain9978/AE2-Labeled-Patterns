@@ -102,18 +102,11 @@ public class MServerSettingToggleButton<T extends Enum<T>> extends ServerSetting
                 GUIText.MoveConvenienceButtonNone.text()
         );
         addAppearance(
-                Icon.BLOCKING_MODE_YES,
+                Icon.BLOCKING_MODE_NO,
                 MSettings.TERMINAL_MOVE_CONVENIENCE,
                 MoveConvenience.ONCE_FOR_ALL,
                 GUIText.MoveConvenienceButtonTitle.text(),
                 GUIText.MoveConvenienceButtonForAll.text()
-        );
-        addAppearance(
-                Icon.BLOCKING_MODE_NO,
-                MSettings.TERMINAL_MOVE_CONVENIENCE,
-                MoveConvenience.ONCE_FOR_ALL_STRICT,
-                GUIText.MoveConvenienceButtonTitle.text(),
-                GUIText.MoveConvenienceButtonForAllStrict.text()
         );
 
         addAppearance(

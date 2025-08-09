@@ -1,0 +1,37 @@
+{
+  "$schema": "../schema.json",
+  "includes": ["common/common.json"],
+  "generatedBackground": {
+    "width": 200,
+    "height": 108
+  },
+  "text": {
+    "dialog_title": {
+      "position": {
+        "left": 8,
+        "top": 7
+      },
+      "text": {
+        "translate": "gui.ae2.TerminalSettingsTitle"
+      }
+    }
+  },
+  "widgets": {
+    "back": {
+      "left": 176,
+      "top": -5,
+      "width": 20,
+      "height": 20
+    },
+    "autoFocusCheckbox": {
+      "left": 10,
+      "top": 25,
+      "width": 180
+    },
+    "rememberPositionCheckbox": {
+      "left": 10,
+      "top": 50,
+      "width": 180
+    }
+  }
+}

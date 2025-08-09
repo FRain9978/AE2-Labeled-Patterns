@@ -7,7 +7,7 @@ import appeng.client.gui.widgets.IconButton;
 import appeng.menu.AEBaseMenu;
 import net.minecraft.network.chat.Component;
 import org.ae2LabeledPatterns.menus.ILabelsProvider;
-import org.ae2LabeledPatterns.menus.LabelListScreen;
+import org.ae2LabeledPatterns.menus.subscreens.LabelListScreen;
 
 import java.util.List;
 

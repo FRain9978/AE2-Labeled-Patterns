@@ -1,5 +1,6 @@
 package org.ae2LabeledPatterns.menus;
 
+import appeng.api.config.Actionable;
 import appeng.api.config.Settings;
 import appeng.api.config.ShowPatternProviders;
 import appeng.api.config.YesNo;
@@ -8,19 +9,27 @@ import appeng.api.implementations.blockentities.PatternContainerGroup;
 import appeng.api.inventories.InternalInventory;
 import appeng.api.networking.IGrid;
 import appeng.api.networking.IGridNode;
-import appeng.api.storage.ILinkStatus;
+import appeng.api.networking.energy.IEnergySource;
+import appeng.api.networking.security.IActionHost;
+import appeng.api.stacks.AEItemKey;
+import appeng.api.storage.*;
 import appeng.core.AELog;
 import appeng.core.definitions.AEItems;
 import appeng.core.network.clientbound.SetLinkStatusPacket;
 import appeng.helpers.InventoryAction;
 import appeng.helpers.patternprovider.PatternContainer;
+import appeng.me.helpers.ActionHostEnergySource;
 import appeng.menu.AEBaseMenu;
+import appeng.menu.SlotSemantic;
+import appeng.menu.SlotSemantics;
 import appeng.menu.guisync.GuiSync;
 import appeng.menu.guisync.LinkStatusAwareMenu;
 import appeng.menu.implementations.MenuTypeBuilder;
+import appeng.menu.slot.FakeSlot;
 import appeng.util.inv.AppEngInternalInventory;
 import appeng.util.inv.FilteredInternalInventory;
 import appeng.util.inv.filter.IAEItemFilter;
+import com.mojang.logging.LogUtils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -42,6 +51,9 @@ import java.util.*;
 
 public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements LinkStatusAwareMenu, ILabelsProvider {
     private final ILabeledPatternAccessTermMenuHost host;
+    protected final MEStorage storage;
+    protected final IEnergySource energySource;
+
     @GuiSync(1)
     public ShowPatternProviders showPatternProviders;
     @GuiSync(2)
@@ -89,6 +101,21 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
         this.host = host;
         if (bindInventory) {
             this.createPlayerInventorySlots(ip);
+        }
+
+        this.storage = new SupplierStorage(() -> {
+            var grid = this.getGrid();
+            if (grid != null) {
+                return grid.getStorageService().getInventory();
+            }
+            return null;
+        });
+        if (host instanceof IActionHost actionHost) {
+            this.energySource = new ActionHostEnergySource(actionHost);
+            LogUtils.getLogger().debug("instanceof IActionHost");
+        } else {
+            this.energySource = IEnergySource.empty();
+            LogUtils.getLogger().debug("NOT instanceof IActionHost");
         }
 
         registerClientAction(ACTION_CYCLE_TAG, Boolean.class, this::cycleTag);
@@ -269,7 +296,7 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
     }
 
     public void quickMoveToPatternContainer(ServerPlayer player, int playerInventorySlot, int mouseButton, List<Long> containerIds, PatternContainerGroup group) {
-        if (playerInventorySlot >= 0 && playerInventorySlot <= player.getInventory().getContainerSize()){
+        if (playerInventorySlot >= 0 && playerInventorySlot < player.getInventory().getContainerSize()){
             ItemStack carried = player.getInventory().getItem(playerInventorySlot);
             if (carried.isEmpty()) {
                 return;
@@ -295,71 +322,7 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
                 }
                 case ONCE_FOR_ALL: {
                     if (group.equals(nothingGroup)) return;
-                    // first check how many blank pattern in player's inventory
-                    int blankPatternCount = 0;
-                    Map<Integer, Integer> patternCount = new HashMap<>();
-                    for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
-                        ItemStack stack = player.getInventory().getItem(i);
-                        if (stack.is(AEItems.BLANK_PATTERN.get())) {
-                            blankPatternCount += stack.getCount();
-                            patternCount.put(i, stack.getCount());
-                        }
-                    }
-                    int insertedCount = -1;
-                    Slot patternSlot = getSlot(playerInventorySlot);
-                    ItemStack itemStack = patternSlot.getItem();
-                    // if there are blank patterns, insert the carried item to all container in byId map as many as possible
-                    var ids = new ArrayList<>(mouseButton == 1 ? containerIds.reversed(): containerIds);
-                    Set<Long> visitedContainerIds = new HashSet<>();
-                    for (Long id : ids){
-                        ContainerTracker inv = this.byId.get(id);
-                        visitedContainerIds.add(id);
-                        if (isVisible(inv.container) && inv.group.equals(group) && insertPatternToContainer(itemStack.copy(), inv.server, false)) {
-                            insertedCount++;
-                            if (insertedCount >= blankPatternCount) {
-                                break; // stop if we have inserted as many as we can
-                            }
-                        }
-                    }
-                    if (insertedCount < blankPatternCount){
-                        for (ContainerTracker containerTracker : this.byId.values()) {
-                            if (visitedContainerIds.contains(containerTracker.serverId)) continue;
-                            if (isVisible(containerTracker.container) && containerTracker.group.equals(group) && insertPatternToContainer(itemStack.copy(), containerTracker.server, false)) {
-                                insertedCount++;
-                                if (insertedCount >= blankPatternCount) {
-                                    break; // stop if we have inserted as many as we can
-                                }
-                            }
-                        }
-                    }
 
-                    if (insertedCount >= 0) {
-                        // if inserted, remove the carried item from player's inventory
-//                        player.getInventory().setItem(playerInventorySlot, ItemStack.EMPTY);
-                        patternSlot.set(ItemStack.EMPTY);
-                        // then update the blank pattern count in player's inventory
-                        for (Map.Entry<Integer, Integer> entry : patternCount.entrySet()) {
-                            int slot = entry.getKey();
-                            int count = entry.getValue();
-                            int newCount = count - insertedCount;
-                            if (newCount <= 0) {
-                                getSlot(slot).set(ItemStack.EMPTY);
-                                insertedCount -= count;
-                            } else {
-                                getSlot(slot).getItem().setCount(newCount);
-                                insertedCount = 0;
-                            }
-                            if (insertedCount <= 0) {
-                                break;
-                            }
-                        }
-                    }
-                    return;
-                }
-                case ONCE_FOR_ALL_STRICT: {
-                    if (group.equals(nothingGroup)) return;
-//                    if (currentTag.isEmpty()) return;
-                    // first check how many blank pattern in player's inventory
                     int blankPatternCount = 0;
                     Map<Integer, Integer> patternCount = new HashMap<>();
                     for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
@@ -369,6 +332,7 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
                             patternCount.put(i, stack.getCount());
                         }
                     }
+                    int storageNeedPatternCount = 0;
                     int insertedCount = -1;
                     Slot patternSlot = getSlot(playerInventorySlot);
                     ItemStack itemStack = patternSlot.getItem();
@@ -378,35 +342,43 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
                         if (isVisible(containerTracker.container) && containerTracker.group.equals(group) && insertPatternToContainer(itemStack.copy(), containerTracker.server, true)) {
                             containerTrackers.add(containerTracker);
                             insertedCount++;
-                            if (insertedCount > blankPatternCount) {
-                                // strict mode return directly
-                                return;
-                            }
+                        }
+                    }
+                    if (insertedCount < 0) {
+                        return;
+                    }
+                    if (insertedCount > blankPatternCount) {
+                        storageNeedPatternCount = insertedCount - blankPatternCount;
+                    }
+                    if (storageNeedPatternCount > 0){
+                        long extraCount = StorageHelper.poweredExtraction(this.energySource, this.storage,
+                                AEItemKey.of(AEItems.BLANK_PATTERN.get()), storageNeedPatternCount, this.getActionSource(), Actionable.SIMULATE);
+                        if (extraCount < storageNeedPatternCount) {
+                            return;
                         }
                     }
                     for (ContainerTracker container : containerTrackers) {
                         insertPatternToContainer(itemStack.copy(), container.server, false);
                     }
-                    if (insertedCount >= 0) {
-                        // if inserted, remove the carried item from player's inventory
-                        patternSlot.set(ItemStack.EMPTY);
-//                        player.getInventory().setItem(playerInventorySlot, ItemStack.EMPTY);
-                        // then update the blank pattern count in player's inventory
-                        for (Map.Entry<Integer, Integer> entry : patternCount.entrySet()) {
-                            int slot = entry.getKey();
-                            int count = entry.getValue();
-                            int newCount = count - insertedCount;
-                            if (newCount <= 0) {
-                                getSlot(slot).set(ItemStack.EMPTY);
-                                insertedCount -= count;
-                            } else {
-                                getSlot(slot).getItem().setCount(newCount);
-                                insertedCount = 0;
-                            }
-                            if (insertedCount <= 0) {
-                                break;
-                            }
+                    patternSlot.set(ItemStack.EMPTY);
+                    for (Map.Entry<Integer, Integer> entry : patternCount.entrySet()) {
+                        int slot = entry.getKey();
+                        int count = entry.getValue();
+                        int newCount = count - insertedCount;
+                        if (newCount <= 0) {
+                            getSlot(slot).set(ItemStack.EMPTY);
+                            insertedCount -= count;
+                        } else {
+                            getSlot(slot).getItem().setCount(newCount);
+                            insertedCount = 0;
                         }
+                        if (insertedCount <= 0) {
+                            break;
+                        }
+                    }
+                    if (storageNeedPatternCount > 0){
+                        StorageHelper.poweredExtraction(this.energySource, this.storage,
+                                AEItemKey.of(AEItems.BLANK_PATTERN.get()), storageNeedPatternCount, this.getActionSource());
                     }
                 }
             }
@@ -548,6 +520,10 @@ public class LabeledPatternAccessTerminalMenu extends AEBaseMenu implements Link
                 }
             }
         }
+    }
+
+    public ISubMenuHost getHost() {
+        return host;
     }
 
     private static class VisitorState {

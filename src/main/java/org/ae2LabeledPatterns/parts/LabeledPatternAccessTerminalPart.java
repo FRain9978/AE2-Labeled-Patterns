@@ -6,8 +6,10 @@ import appeng.api.config.YesNo;
 import appeng.api.parts.IPartItem;
 import appeng.api.parts.IPartModel;
 import appeng.api.storage.ILinkStatus;
+import appeng.api.storage.MEStorage;
 import appeng.api.util.IConfigManager;
 import appeng.items.parts.PartModels;
+import appeng.menu.ISubMenu;
 import appeng.menu.MenuOpener;
 import appeng.menu.locator.MenuLocators;
 import appeng.parts.PartModel;
@@ -16,6 +18,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.ae2LabeledPatterns.AE2LabeledPatterns;
 import org.ae2LabeledPatterns.config.MSettings;
@@ -75,6 +78,11 @@ public class LabeledPatternAccessTerminalPart extends AbstractDisplayPart implem
         this.currentTag = PatternProviderLabel.readFromNBT(tag);
     }
 
+    @Override
+    public MEStorage getInventory() {
+        return null;
+    }
+
     public ILinkStatus getLinkStatus() {
         return ILinkStatus.ofManagedNode(this.getMainNode());
     }
@@ -96,5 +104,15 @@ public class LabeledPatternAccessTerminalPart extends AbstractDisplayPart implem
             this.currentTag = tag;
             this.getHost().markForSave();
         }
+    }
+
+    @Override
+    public void returnToMainMenu(Player player, ISubMenu subMenu) {
+
+    }
+
+    @Override
+    public ItemStack getMainMenuIcon() {
+        return PartRegisters.LABELED_PATTERN_ACCESS_TERMINAL.toStack();
     }
 }
