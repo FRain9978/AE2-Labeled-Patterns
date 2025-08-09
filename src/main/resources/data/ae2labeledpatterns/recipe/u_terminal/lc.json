@@ -10,7 +10,7 @@
     "item": "ae2labeledpatterns:wireless_labeled_pattern_access_terminal"
   },
   "terminalB": {
-    "item": "ae2wtlib:wireless_crafting_terminal"
+    "item": "ae2:wireless_crafting_terminal"
   },
   "terminalAName": "labeled_pattern_access",
   "terminalBName": "crafting"
